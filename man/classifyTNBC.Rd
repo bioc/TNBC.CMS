@@ -13,5 +13,5 @@ classifyTNBC(mat)
 A vector of assigned subtypes.
 }
 \description{
-This function assigns the TNBC consensus molecular subtype to TNBC samples.
+Assign the TNBC consensus molecular subtype to TNBC samples.
 }

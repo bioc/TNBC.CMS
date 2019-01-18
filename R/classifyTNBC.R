@@ -10,24 +10,23 @@
 #'@importFrom stats predict median
 classifyTNBC <- function(mat){
 
-  #Avoid test-set bias
-  commongenes = intersect(rownames(exprPublic), rownames(mat))
-  input = cbind(exprPublic[commongenes, ], mat[commongenes, ])
-  output = sva::ComBat(dat = as.matrix(input), batch = c(rep(0, ncol(exprPublic)), rep(1, ncol(mat))),
-                       ref.batch = 0)
-  mat = output[, ((ncol(exprPublic)+1):ncol(output))]
+  #Adjust scales of input data
+  commongenes = intersect(rownames(expr_core), rownames(mat))
+  combat_input = cbind(expr_core[commongenes, ], mat[commongenes, ])
+  batch = c(rep(0, ncol(expr_core)), rep(1, ncol(mat)))
+  combat_output = ComBat(dat = as.matrix(combat_input), batch = batch, ref.batch = 0)
+  mat_scaled = combat_output[, ((ncol(expr_core)+1):ncol(combat_output))]
 
   #Impute missing values
-  missings = rownames(mat)[!rownames(mat) %in% genelist]
+  missings = rownames(mat_scaled)[!rownames(mat_scaled) %in% genelist]
   if(length(missings) > 0){
-    mat = rbind(mat, matrix(NA, nrow = length(missings), ncol = ncol(mat),
-                            dimnames = list(missings, colnames(mat))))
-    mat = impute(mat, what = "median")
-    mat = mat[genelist,]
+    mat_scaled = rbind(mat_scaled, matrix(NA, nrow = length(missings), ncol = ncol(mat_scaled),
+                            dimnames = list(missings, colnames(mat_scaled))))
+    mat_scaled = impute(mat_scaled, what = "mean")
+    mat_scaled = mat_scaled[genelist,]
   }
 
   #Predict CMS of new samples
-  mat = mat - apply(mat, 1, median)
-  predict(svmModel, data.frame(t(mat), check.names = F))
+  predict(svmModel, data.frame(t(mat_scaled), check.names = F))
 
 }
