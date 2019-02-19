@@ -4,19 +4,10 @@
 \alias{predictCMS}
 \title{TNBC consensus molecular subtype prediction}
 \usage{
-predictCMS(exp.mat, gene.sig = T, gsa = T, drug.sig = T,
-  rnaseq = F)
+predictCMS(exp.mat)
 }
 \arguments{
 \item{exp.mat}{A matrix of gene expression with genes in rows and samples in columns (rownames corresopnding to gene symbol).}
-
-\item{gene.sig}{logical to determine if gene expression signature scores are computed}
-
-\item{gsa}{logical to determine if gene set analysis is performed}
-
-\item{drug.sig}{logical to determine if drug signatures are computed}
-
-\item{rnaseq}{logical to determine if input data is RNA-Seq gene expression profile}
 }
 \value{
 A vector of assigned subtypes.
