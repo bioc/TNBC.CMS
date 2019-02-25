@@ -4,6 +4,7 @@
 #'
 #'@param exp.mat A matrix of gene expression with genes in rows and samples in columns (rownames corresopnding to gene symbol).
 #'@param pred A vector of predicted consensus molecular subtypes.
+#'@param gene.set A user-provided list of gene sets associated with drug response. Names of gene sets must follow the format of [DRUG NAME]_[RESISTANCE/RESPONSE]_[UP/DN] (e.g. CISPLATIN_RESISTANCE_DN).
 #'@return A matrix of drug signature scores.
 #'@details Drug signature scores are the average of expression values of genes included in gene sets from MSigDB.
 #'@references Liberzon,A. et al. (2011) Molecular signatures database (MSigDB) 3.0. \emph{Bioinformatics},27,1739-40.
@@ -11,24 +12,33 @@
 #'@importFrom grDevices colorRampPalette
 #'@importFrom RColorBrewer brewer.pal
 #'@export
-computeDS <- function(exp.mat, pred){
+#'@examples
+#'# Load gene expression profiles of TNBC samples
+#'data(GSE25055.exprs)
+#'
+#'# Predict consensus molecular subtypes of TNBC samples
+#'predictions <- predictCMS(exp.mat = GSE25055.exprs)
+#'
+#'# Compute drug signature scores
+#'resultDS <- computeDS(exp.mat = GSE25055.exprs, pred = predictions)
+computeDS <- function(exp.mat, pred, gene.set = NULL){
 
-  pred = factor(pred, levels = c("MSL", "IM", "LAR", "SL"))
+  pred <- factor(pred, levels = c("MSL", "IM", "LAR", "SL"))
 
-  computeSignature = function(ds){
+  computeSignature <- function(ds, gs){
 
-    gs.resistant = ds[grep("RESISTANCE", ds)];gs.responsive = ds[grep("RESPONSE", ds)]
-    gs.up = c(gs.resistant[grep("_DN", gs.resistant)], gs.responsive[grep("_UP", gs.responsive)])
-    gs.down = c(gs.resistant[grep("_UP", gs.resistant)], gs.responsive[grep("_DN", gs.responsive)])
+    gs.resistant <- ds[grep("RESISTANCE", ds)];gs.responsive = ds[grep("RESPONSE", ds)]
+    gs.up <- c(gs.resistant[grep("_DN", gs.resistant)], gs.responsive[grep("_UP", gs.responsive)])
+    gs.down <- c(gs.resistant[grep("_UP", gs.resistant)], gs.responsive[grep("_DN", gs.responsive)])
 
-    gene.up = unique(unlist(CGP.geneset[gs.up]));gene.down = unique(unlist(CGP.geneset[gs.down]))
-    score.up = colMeans(exp.mat[gene.up,], na.rm = T)
-    score.down = colMeans(exp.mat[gene.down,], na.rm = T)
-    na.up = sum(is.na(score.up)) > 0
-    na.down = sum(is.na(score.down)) > 0
+    gene.up <- unique(unlist(gs[gs.up]));gene.down = unique(unlist(gs[gs.down]))
+    score.up <- colMeans(exp.mat[gene.up,], na.rm = T)
+    score.down <- colMeans(exp.mat[gene.down,], na.rm = T)
+    na.up <- sum(is.na(score.up)) > 0
+    na.down <- sum(is.na(score.down)) > 0
     if(na.up & na.down){
-      out = rep(NA, ncol(exp.mat))
-      names(out) = colnames(exp.mat)
+      out <- rep(NA, ncol(exp.mat))
+      names(out) <- colnames(exp.mat)
       return(out)
     }
     else if(na.up){
@@ -42,33 +52,52 @@ computeDS <- function(exp.mat, pred){
     }
   }
 
-  ds.dat = data.frame(row.names = colnames(exp.mat), stringsAsFactors = F)
-  ds.dat$APLIDIN = computeSignature(c("MITSIADES_RESPONSE_TO_APLIDIN_UP",
-                                      "MITSIADES_RESPONSE_TO_APLIDIN_DN"))
-  ds.dat$CISPLATIN = computeSignature(c("KANG_CISPLATIN_RESISTANCE_DN", "LI_CISPLATIN_RESISTANCE_UP",
-                                        "TSUNODA_CISPLATIN_RESISTANCE_UP",
-                                        "KANG_CISPLATIN_RESISTANCE_UP"))
-  ds.dat$DASATINIB = computeSignature(c("HUANG_DASATINIB_RESISTANCE_DN",
-                                        "HUANG_DASATINIB_RESISTANCE_UP"))
-  ds.dat$FORSKOLIN = computeSignature("SASSON_RESPONSE_TO_FORSKOLIN_UP")
-  ds.dat$IMATINIB = computeSignature("MAHADEVAN_IMATINIB_RESISTANCE_UP")
-  ds.dat$TROGLITAZONE = computeSignature("RUAN_RESPONSE_TO_TROGLITAZONE_UP")
-  ds.dat$TZD = computeSignature("GERHOLD_RESPONSE_TO_TZD_UP")
-  ds.dat$SB216763 = computeSignature("WANG_RESPONSE_TO_GSK3_INHIBITOR_SB216763_UP")
-  ds.dat$ANDROGEN = computeSignature(c("DOANE_RESPONSE_TO_ANDROGEN_UP", "WANG_RESPONSE_TO_ANDROGEN_UP",
-                                       "MOTAMED_RESPONSE_TO_ANDROGEN_UP",
-                                       "NELSON_RESPONSE_TO_ANDROGEN_UP",
-                                       "MOTAMED_RESPONSE_TO_ANDROGEN_DN"))
-  ds.dat$TAMOXIFEN = computeSignature(c("BECKER_TAMOXIFEN_RESISTANCE_UP",
-                                        "RIGGINS_TAMOXIFEN_RESISTANCE_UP",
-                                        "MASSARWEH_TAMOXIFEN_RESISTANCE_UP"))
-  ds.dat$BEXAROTENE = computeSignature(c("WANG_RESPONSE_TO_BEXAROTENE_UP",
-                                         "WANG_RESPONSE_TO_BEXAROTENE_DN"))
-  ds.dat$DOXORUBICIN = computeSignature("KANG_DOXORUBICIN_RESISTANCE_UP")
+  if(!is.null(gene.set)){
+    gn <- names(gene.set)
+    drug.names <- unique(unlist(strsplit(gn, split = "\\_"))[seq(0, length(gn) -1 ) * 3 + 1])
+    ds.dat <- t(sapply(drug.names, function(x) computeSignature(gn[grep(x, gn)], gene.set)))
 
-  ds.dat = t(ds.dat)
-  annotation_col = data.frame(row.names = colnames(exp.mat)[order(pred)],
-                              CMS = pred[order(pred)])
+    annotation_col <- data.frame(row.names = colnames(exp.mat)[order(pred)],
+                                 CMS = pred[order(pred)])
+    pheatmap(ds.dat[,colnames(exp.mat)[order(pred)]],
+             color = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100),
+             annotation_col = annotation_col, scale = "row",
+             annotation_colors = list(CMS = c("MSL" = "brown2", "IM" = "gold2",
+                                              "LAR" = "yellowgreen", "SL" = "midnightblue")),
+             cluster_cols = FALSE, cluster_rows = FALSE, legend = TRUE,
+             annotation_names_col = FALSE, show_colnames = FALSE)
+
+    return(ds.dat)
+  }
+
+  ds.dat <- data.frame(row.names = colnames(exp.mat), stringsAsFactors = F)
+  ds.dat$APLIDIN <- computeSignature(c("MITSIADES_RESPONSE_TO_APLIDIN_UP",
+                                       "MITSIADES_RESPONSE_TO_APLIDIN_DN"), CGP.geneset)
+  ds.dat$CISPLATIN <- computeSignature(c("KANG_CISPLATIN_RESISTANCE_DN", "LI_CISPLATIN_RESISTANCE_UP",
+                                         "TSUNODA_CISPLATIN_RESISTANCE_UP",
+                                         "KANG_CISPLATIN_RESISTANCE_UP"), CGP.geneset)
+  ds.dat$DASATINIB <- computeSignature(c("HUANG_DASATINIB_RESISTANCE_DN",
+                                         "HUANG_DASATINIB_RESISTANCE_UP"), CGP.geneset)
+  ds.dat$FORSKOLIN <- computeSignature("SASSON_RESPONSE_TO_FORSKOLIN_UP", CGP.geneset)
+  ds.dat$IMATINIB <- computeSignature("MAHADEVAN_IMATINIB_RESISTANCE_UP", CGP.geneset)
+  ds.dat$TROGLITAZONE <- computeSignature("RUAN_RESPONSE_TO_TROGLITAZONE_UP", CGP.geneset)
+  ds.dat$TZD <- computeSignature("GERHOLD_RESPONSE_TO_TZD_UP", CGP.geneset)
+  ds.dat$SB216763 <- computeSignature("WANG_RESPONSE_TO_GSK3_INHIBITOR_SB216763_UP", CGP.geneset)
+  ds.dat$ANDROGEN <- computeSignature(c("DOANE_RESPONSE_TO_ANDROGEN_UP", "WANG_RESPONSE_TO_ANDROGEN_UP",
+                                        "MOTAMED_RESPONSE_TO_ANDROGEN_UP",
+                                        "NELSON_RESPONSE_TO_ANDROGEN_UP",
+                                        "MOTAMED_RESPONSE_TO_ANDROGEN_DN"), CGP.geneset)
+  ds.dat$TAMOXIFEN <- computeSignature(c("BECKER_TAMOXIFEN_RESISTANCE_UP",
+                                         "RIGGINS_TAMOXIFEN_RESISTANCE_UP",
+                                         "MASSARWEH_TAMOXIFEN_RESISTANCE_UP"), CGP.geneset)
+  ds.dat$BEXAROTENE <- computeSignature(c("WANG_RESPONSE_TO_BEXAROTENE_UP",
+                                          "WANG_RESPONSE_TO_BEXAROTENE_DN"), CGP.geneset)
+  ds.dat$DOXORUBICIN <- computeSignature("KANG_DOXORUBICIN_RESISTANCE_UP", CGP.geneset)
+
+  ds.dat <- t(ds.dat)
+
+  annotation_col <- data.frame(row.names = colnames(exp.mat)[order(pred)],
+                               CMS = pred[order(pred)])
   pheatmap(ds.dat[,colnames(exp.mat)[order(pred)]],
            color = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100),
            annotation_col = annotation_col, scale = "row",

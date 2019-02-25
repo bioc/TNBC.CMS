@@ -1,14 +1,17 @@
 Package: TNBC.CMS
 Type: Package
-Date: 2019-01-15
-Title: Prediction of TNBC Consensus Molecular Subtypes 
-Version: 0.1.0
+Date: 2019-02-25
+Title: TNBC.CMS: Prediction of TNBC Consensus Molecular Subtypes 
+Version: 0.99.0
 Author: Doyeong Yu, Jihyun Kim, In Hae Park, Charny Park 
 Maintainer: Doyeong Yu <nachoryu@ncc.re.kr>
-Description: This package provides a function for predicting consensus molecular subtypes of TNBC patients based on gene expression profile.
+Description: This package implements a machine learning-based classifier for the assignment of consensus molecular subtypes to TNBC samples. It also provides functions to summarize genomic and clinical characteristics.
 License: GPL-3
 Encoding: UTF-8
+biocViews: Classification, Clustering, GeneExpression, SupportVectorMachine
 LazyData: true
 RoxygenNote: 6.1.1
 Depends: R (>= 3.4.4), e1071, quadprog
-Imports: GSVA, pheatmap, grDevices, RColorBrewer, pracma, GGally, R.utils, forestplot, ggplot2, ggpubr, survival
+Imports: GSVA, pheatmap, grDevices, RColorBrewer, pracma, GGally, R.utils, forestplot, ggplot2, ggpubr, survival, grid, stats
+Suggests: knitr
+VignetteBuilder:knitr

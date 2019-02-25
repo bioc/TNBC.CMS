@@ -1,0 +1,170 @@
+%\VignetteIndexEntry{TNBC.CMS: prediction of TNBC consensus molecular subtype}
+%\VignetteDepends{e1071, quadprog}
+%\VignetteImports{GSVA, pheatmap, grDevices, RColorBrewer, pracma}
+%\VignettePackage{TNBC.CMS}
+%\VignetteEngine{knitr::knitr}
+
+%%%http://yihui.name/knitr/options/
+
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{authblk}
+\usepackage{float}
+\geometry{verbose,tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,rmargin=2.5cm}
+\usepackage[table]{xcolor}
+
+
+\begin{document}
+
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(concordance=TRUE)
+options(scipen = 1, digits = 2, warn = -1)
+@
+
+
+\title{\texttt{TNBC.CMS}: prediction of TNBC consensus molecular subtype}
+
+\author[1]{Doyeong Yu}
+\author[1]{Jihyun Kim}
+\author[2]{In Hae Park}
+\author[1]{Charny Park}
+
+\affil[1]{Clinical Genomics Analysis Branch, Research Institute, National Cancer Center, Gyeonggi-do, Republic of Korea}
+\affil[2]{Center for Breast Cancer, Hospital, National Cancer Center, Gyeonggi-do, Republic of Korea}
+
+\maketitle
+\tableofcontents
+\pagebreak
+%------------------------------------------------------------
+\section{Introduction}
+%------------------------------------------------------------
+TNBC.CMS is a package for molecular subtype classification of triple-negative breast cancer (TNBC). While various classification strategies have been proposed, absence of precise subtype classifier was a limitation of patient diagnosis and TNBC studies. Our machine learning-based classifier model was derived from gene expression profiles of 957 TNBC patients. The TNBC.CMS package classifies patients into four consensus molecular subtypes (CMS): mesenchymal-like (MSL), immunomodulatory (IM), luminal AR (LAR) and stem-like (SL). It also provides a summary of genomic and clinical characteristics including survival, hazard ratio, pathway activities and drug responses.
+%------------------------------------------------------------
+\section{Loading package and dataset for case studies}
+%------------------------------------------------------------
+To install the \texttt{TNBC.CMS} package, enter the following commands:
+<<installAndLoadPackages,eval=FALSE,results='hide',message=FALSE>>=
+source("http://bioconductor.org/biocLite.R")
+biocLite("TNBC.CMS")
+@
+
+In this vignette, we walk through a case study of the METABRIC (Molecular Taxonomy of Breast Cancer Internation Consortium) dataset to demonstrate the practical use of our package. The METABRIC dataset was obtained from SYNAPSE. We filtered out samples which seemed to be positive for ER, PR, and HER2 based on immunohistochemistry results and the distribution of gene expression.\paragraph{}
+First, we load the package and the processed expression data. The dataset includes a total of 24,368 genes and 299 samples. Note that rows and columns correspond to genes and samples, and row names must be gene symbols.
+<<loadPackagesAndData>>=
+library(TNBC.CMS)
+load("D:/TNBC/data/METABRIC_processed_expression.rda")
+dim(exprMETABRIC)
+exprMETABRIC[1:5, 1:5]
+@
+
+\pagebreak
+
+%------------------------------------------------------------
+\section{Case study: CMS classification}
+%------------------------------------------------------------
+The \texttt{predictCMS} function assigns consensus molecular subtypes to TNBC samples based on a gene expression matrix. Input matrix should neither be scaled nor log-transformed. Class probabilities can be retrieved by accessing the \texttt{probabilities} attribute.
+<<prediction>>=
+predictions <- predictCMS(exprMETABRIC)
+table(predictions)
+head(attr(predictions, "probabilities"))
+@
+
+%------------------------------------------------------------
+\section{Case study: summary of genomic and clinical characteristics}
+%------------------------------------------------------------
+The \texttt{TNBC.CMS} package includes several functions for studying genomic and clinical characteristics of the consensus molecular subtypes. In this section, we apply these functions to the METABRIC datasets of gene expression and clinical features.\paragraph{}
+The \texttt{computeGES} function calculates signature scores for the following 7 gene expression signatures: EMT (epithelial-mesencymal transition), stromal, immune, microenvironment, stemness, hormone, and CIN (chromosomal instability). For more details about the gene expression signatures, please see the manual page for \texttt{computeGES} function.\paragraph{}
+As shown in Figure 1, this function also draws boxplots of signature scores with p-values of comparison among the subtypes. Stromal, immune, hormone, and stemness scores are significantly higher in MSL, IM, LAR, and SL subgroups than in other subgroups, respectively.
+
+<<label=ges,fig.height=4,fig.cap="Gene expression signature scores",fig.pos="H",fig.show="hold">>=
+resultGES <- computeGES(exp.mat = exprMETABRIC, pred = predictions, rnaseq = F)
+resultGES[,1:4]
+@
+
+The \texttt{performGSVA} function performs gene set variation analysis on gene sets and produces a heatmap representing GSVA enrichment scores. If gene sets are not given, the hallmark pathway gene sets are used. The user can also choose a kernel for estimating the cumulative distribution function of expression values by setting the \texttt{gsva.kcdf} argument, which is set to \texttt{"Gaussian"} by default. If expression levels are integer counts, the \texttt{"Poisson"} is recommended.\paragraph{}
+Figure 2 shows differential activation of the hallmark pathways across the subtypes. The MSL subtype has high levels of EMT and P53 pathway activation, and the IM subtype shows the highest inflammatory response. AR and ER response pathways are highly activated in the LAR subtpe, and the expression of cell cycle associated pathway genes is up-regulated in the SL subtype.
+<<label=gsa,fig.height=6,fig.cap="GSVA enrichment scores",fig.pos="H",fig.show="hold">>=
+resultGSVA <- performGSVA(exp.mat = exprMETABRIC, pred = predictions, gene.set = NULL)
+head(resultGSVA[,1:4])
+@
+
+The \texttt{TNBC.CMS} package provides two functions for survival analysis: \texttt{plotKM} and \texttt{plotHR}. Here, we use the five-year survival data from the METABRIC dataset to study the association between overall survival and the consensus molecular subtypes.\paragraph{}
+The \texttt{plotKM} function produces a Kaplan-Meier curve for each consensus molecular subtype like Figure 3. The MSL subtype had significantly better prognosis than other subtypes while the SL group showed the worst prognosis, which is consistent with our previous study.
+<<label=os,fig.height=3,fig.width=5,fig.cap="Overall survival",fig.pos="H",fig.show="hold",fig.align="center">>=
+load("D:/TNBC/data/METABRIC_clinical_features.rda")
+time <- clinMETABRIC$OS5_MONTHS
+event <- clinMETABRIC$OS5_STATUS
+plotKM(pred = predictions, time = time, event = event)
+@
+
+The \texttt{plotHR} produces a forest plot of hazard ratios for genes that the user provides. For each input gene, samples are divided into high and low groups based on its expression level and the 95\% confidence interval for the hazard ratio is calculated. We selected 10 genes significantly associated with overall survival and generated a forest plot (Figure 4).
+<<label=hr,fig.height=3,fig.cap="Forest plot of hazard ratios",fig.pos="H",fig.show="hold">>=
+library(survival)
+
+#Test for difference of survival between low and high expression groups
+surv <- Surv(time, event)
+chisq <- apply(exprMETABRIC, 1, function(x) survdiff(surv ~ (x > median(x)))$chisq)
+pval <- 1-pchisq(chisq, 1)
+
+#Select 10 genes with lowest p-values for the log-rank test
+gs <- names(sort(pval)[1:10])
+gs
+plotHR(exp.mat = exprMETABRIC, gene.symbol = gs, pred = predictions, time = time,
+       event = event, by.subtype = F)
+@
+
+Also, as shown in Figure 5, subtype-specific hazard ratios for genes of interest can be computed by setting the \texttt{by.subtype} argument.
+<<label=hrsub,fig.height=4,fig.cap="Forest plot of subtype-specific hazard ratios",fig.pos="H",fig.show="hold">>=
+plotHR(exp.mat = exprMETABRIC, gene.symbol = gs[1:4], pred = predictions,
+       time = clinMETABRIC$OS5_MONTHS, event = clinMETABRIC$OS5_STATUS, by.subtype = T)
+@
+
+%------------------------------------------------------------
+\section{Case study: drug response investigation}
+%------------------------------------------------------------
+The \texttt{TNBC.CMS} package also provides a function for predicting drug responses. The \texttt{computeDS} function computes drug signature scores for the corresponding gene sets in the MSigDB CGP (chemical and genetic perturbations) collection and draws a heatmap of the signature scores. Drug signature scores are calculated as the difference between the average expression values of gene sets associated with drug response and resistance. The higher a signature score is, the more likely a patient is to be responsive. The user can provide their own gene sets via the \texttt{gene.set} argument. Note that names of gene sets must follow the format of [DRUG NAME]{\_}[RESPONSE/RESISTANCE]{\_}[UP/DN] (e.g. CISPLATIN{\_}RESISTANCE{\_}UP).\paragraph{}
+Figure 6 shows a heatmap of drug signature scores for each sample. The MSL and SL subtypes appear to be resistant to cisplatin and doxorubicin, respectively. Also, the IM and LAR subtypes show higher levels of signature scores for androgen agonist and SB216763 (an inhibitor of GSK3B) than other subtypes, respectively.
+<<label=ds,fig.height=3,fig.cap="Drug signature scores",fig.pos="H",fig.show="hold">>=
+resultDS <- computeDS(exp.mat = exprMETABRIC, pred = predictions)
+head(resultDS[,1:4])
+@
+
+\pagebreak
+
+%------------------------------------------------------------
+\section{Saving results}
+%------------------------------------------------------------
+For future analysis, it is useful to save the results of subtype assignment and characterization into a data frame and save it into a text file.
+<<saveResults>>=
+dfCMS <- data.frame(row.names = colnames(exprMETABRIC), CMS = predictions, t(resultGES),
+                    t(resultDS), stringsAsFactors = F)
+head(dfCMS)
+write.table(dfCMS, file = "D:/TNBC/result/METABRIC_CMS.txt")
+@
+
+%------------------------------------------------------------
+\section{Session Info}
+%------------------------------------------------------------
+<<sessionInfo>>=
+sessionInfo()
+@
+
+%------------------------------------------------------------
+\section{References}
+%------------------------------------------------------------
+\begin{description}
+\item Aran,D. et al. (2017) xCell: digitally portraying the tissue cellular heterogeneity landscape. \emph{Genome biology},18,220.
+\item Carter,S.L. et al. (2006) A signature of chromosomal instability inferred from gene expression profiles predicts clinical outcome in multiple human cancers. \textit{Nature genetics},38,1043.
+\item Malta,T.M. et al. (2018) Machine learning identifies stemness features associated with oncogenic dedifferentiation. \textit{Cell},173,338-354.
+\item Tan,T.Z. et al. (2014) Epithelial-mesenchymal transition spectrum quantification and its efficacy in deciphering survival and drug responses of cancer patients. \textit{EMBO molecular medicine},6,1279-93.
+\item Yoshihara,K. et al. (2013) Inferring tumour purity and stromal and immune cell admixture from expression data. \textit{Nature communications},4,2612.
+
+\end{description}
+
+\end{document}

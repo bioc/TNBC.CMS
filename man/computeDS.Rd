@@ -4,12 +4,14 @@
 \alias{computeDS}
 \title{Computation of drug signature scores.}
 \usage{
-computeDS(exp.mat, pred)
+computeDS(exp.mat, pred, gene.set = NULL)
 }
 \arguments{
 \item{exp.mat}{A matrix of gene expression with genes in rows and samples in columns (rownames corresopnding to gene symbol).}
 
 \item{pred}{A vector of predicted consensus molecular subtypes.}
+
+\item{gene.set}{A user-provided list of gene sets associated with drug response. Names of gene sets must follow the format of [DRUG NAME]_[RESISTANCE/RESPONSE]_[UP/DN] (e.g. CISPLATIN_RESISTANCE_DN).}
 }
 \value{
 A matrix of drug signature scores.
@@ -19,6 +21,16 @@ Computes drug signature scores. Also draws heatmap representing the average sign
 }
 \details{
 Drug signature scores are the average of expression values of genes included in gene sets from MSigDB.
+}
+\examples{
+# Load gene expression profiles of TNBC samples
+data(GSE25055.exprs)
+
+# Predict consensus molecular subtypes of TNBC samples
+predictions <- predictCMS(exp.mat = GSE25055.exprs)
+
+# Compute drug signature scores
+resultDS <- computeDS(exp.mat = GSE25055.exprs, pred = predictions)
 }
 \references{
 Liberzon,A. et al. (2011) Molecular signatures database (MSigDB) 3.0. \emph{Bioinformatics},27,1739-40.

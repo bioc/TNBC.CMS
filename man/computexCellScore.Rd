@@ -17,3 +17,4 @@ A data frame containing stromal and immune scores
 \description{
 Computes microenvironment score. This function wraps around the \code{xCellAnalysis} function of the \code{xCell} package to compute microenvironment score.
 }
+\keyword{internal}

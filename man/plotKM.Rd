@@ -13,6 +13,21 @@ plotKM(pred, time, event)
 
 \item{event}{A vector representing survival status (0 = alive, 1 = dead).}
 }
+\value{
+A \code{ggplot} object.
+}
 \description{
 Produces Kaplan-Meier survival curves for each subtype.
+}
+\examples{
+# Load gene expression profiles and clinical information of TNBC samples
+data(GSE25055.exprs)
+data(GSE25055.clinical)
+
+# Predict consensus molecular subtypes of TNBC samples
+predictions <- predictCMS(exp.mat = GSE25055.exprs)
+
+# Plot Kaplan-Meier curves for each subtype
+plotKM(pred = predictions, time = GSE25055.clinical$DFS.months,
+       event = GSE25055.clinical$DFS.status)
 }

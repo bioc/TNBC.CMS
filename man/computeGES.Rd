@@ -4,20 +4,20 @@
 \alias{computeGES}
 \title{Computation of gene expression signature scores.}
 \usage{
-computeGES(exp.mat, pred, rnaseq = F)
+computeGES(exp.mat, pred, rnaseq = FALSE)
 }
 \arguments{
 \item{exp.mat}{A matrix of gene expression with genes in rows and samples in columns (rownames corresopnding to gene symbol).}
 
 \item{pred}{A vector of predicted consensus molecular subtypes.}
 
-\item{rnaseq}{logical to determine if input data is RNA-Seq gene expression profile.}
+\item{rnaseq}{logical to determine if input data is RNA-Seq gene expression profile. By default, it is FALSE.}
 }
 \value{
 A matrix of gene expression signature scores.
 }
 \description{
-Computes gene expression signature scores. Also draws heatmap representing the average signature scores for each subtype.
+Computes gene expression signature scores. Also draws boxplots representing the average signature scores for each subtype.
 }
 \details{
 \code{computeGES} calculates the following 7 gene expression signature scores:
@@ -30,6 +30,16 @@ Computes gene expression signature scores. Also draws heatmap representing the a
 \item Hormone: average of expression values of AR, ERBB2, ESR1, and PGR.
 \item CIN (chromosomal instability): average of expression values of genes included in the CIN70 signature published by \cite{Carter et al. (2006)}.
 }
+}
+\examples{
+# Load gene expression profiles of TNBC samples
+data(GSE25055.exprs)
+
+# Predict consensus molecular subtypes of TNBC samples
+predictions <- predictCMS(exp.mat = GSE25055.exprs)
+
+# Compute gene expression signature scores
+resultGES <- computeGES(exp.mat = GSE25055.exprs, pred = predictions, rnaseq = FALSE)
 }
 \references{
 Aran,D. et al. (2017) xCell: digitally portraying the tissue cellular heterogeneity landscape. \emph{Genome biology},18,220.

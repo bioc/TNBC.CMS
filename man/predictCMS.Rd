@@ -15,3 +15,11 @@ A vector of assigned subtypes.
 \description{
 This function predicts the TNBC consensus molecular subtype of TNBC samples.
 }
+\examples{
+# Load gene expression profiles of TNBC samples
+data(GSE25055.exprs)
+
+# Predict consensus molecular subtypes of TNBC samples
+predictions <- predictCMS(exp.mat = GSE25055.exprs)
+table(predictions)
+}

@@ -4,18 +4,35 @@
 \alias{performGSVA}
 \title{Gene set variation analysis}
 \usage{
-performGSVA(exp.mat, pred)
+performGSVA(exp.mat, pred, gene.set = NULL, gsva.kcdf = "Gaussian")
 }
 \arguments{
 \item{exp.mat}{A matrix of gene expression with genes in rows and samples in columns (rownames corresopnding to gene symbol).}
 
 \item{pred}{A vector of predicted consensus molecular subtypes.}
+
+\item{gene.set}{Gene sets provided as a list. If NULL, the hallmark pathway gene sets are used.}
+
+\item{gsva.kcdf}{Kernel to be used in the estimation of the cumulative distribution function. By default, this is set to \code{"Gaussian"} which is suitable for continuous expression values. If expression values are counts, \code{"Poisson"} is recommended.}
 }
 \value{
 A matrix of GSVA enrichment scores.
 }
 \description{
-Performs GSVA on the hallmark gene sets. Also draws a heatmap representing GSVA scores.
+Performs GSVA on gene sets. Also draws a heatmap representing GSVA scores.
+}
+\details{
+This is a wrapper function of the \code{gsva} function in the \code{GSVA} package to compute GSVA enrichment scores per sample and produce a heatmap comparing them across consensus molecular subtypes.
+}
+\examples{
+# Load gene expression profiles of TNBC samples
+data(GSE25055.exprs)
+
+# Predict consensus molecular subtypes of TNBC samples
+predictions <- predictCMS(exp.mat = GSE25055.exprs)
+
+# Perform GSVA on the hallmark pathway gene sets
+resultGSVA <- performGSVA(exp.mat = GSE25055.exprs, pred = predictions)
 }
 \references{
 Liberzon,A. et al. (2015) The molecular signatures database hallmark gene set collection. \emph{Cell systems},1,417-425.
