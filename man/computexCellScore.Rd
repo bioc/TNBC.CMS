@@ -7,14 +7,18 @@
 computexCellScore(mat, rnaseq)
 }
 \arguments{
-\item{mat}{A matrix of gene expression with genes in rows and samples in columns (rownames corresopnding to gene symbol).}
+\item{mat}{A matrix of gene expression with genes in rows and 
+samples in columns (rownames corresopnding to gene symbol).}
 
-\item{rnaseq}{logical to determine if input data is RNA-Seq gene expression profile}
+\item{rnaseq}{logical to determine if input data is 
+RNA-Seq gene expression profile}
 }
 \value{
 A data frame containing stromal and immune scores
 }
 \description{
-Computes microenvironment score. This function wraps around the \code{xCellAnalysis} function of the \code{xCell} package to compute microenvironment score.
+Computes microenvironment score. This function wraps around 
+the \code{xCellAnalysis} function of the \code{xCell} package to 
+compute microenvironment score.
 }
 \keyword{internal}

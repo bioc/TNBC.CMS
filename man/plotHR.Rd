@@ -7,9 +7,11 @@
 plotHR(exp.mat, gene.symbol, pred, time, event, by.subtype = TRUE)
 }
 \arguments{
-\item{exp.mat}{A matrix of gene expression with genes in rows and samples in columns (rownames corresopnding to gene symbol).}
+\item{exp.mat}{A matrix of gene expression with genes in rows and 
+samples in columns (rownames corresopnding to gene symbol).}
 
-\item{gene.symbol}{A vector of gene symbols for which hazard ratios are computed.}
+\item{gene.symbol}{A vector of gene symbols for 
+which hazard ratios are computed.}
 
 \item{pred}{A vector of predicted consensus molecular subtypes.}
 
@@ -17,10 +19,15 @@ plotHR(exp.mat, gene.symbol, pred, time, event, by.subtype = TRUE)
 
 \item{event}{A vector representing survival status (0 = alive, 1 = dead).}
 
-\item{by.subtype}{A logical to determine if subtype-specific hazard ratios are computed (default is TRUE).}
+\item{by.subtype}{A logical to determine if subtype-specific 
+hazard ratios are computed (default is TRUE).}
+}
+\value{
+Forest plot of hazard ratios.
 }
 \description{
-Produces a forest plot of hazard ratios for each gene. Also draws a forest plot of subtype-specific hazard ratios.
+Produces a forest plot of hazard ratios for each gene. 
+Also draws a forest plot of subtype-specific hazard ratios.
 }
 \examples{
 # Load gene expression profiles and clinical information of TNBC samples
@@ -31,12 +38,12 @@ data(GSE25055.clinical)
 predictions <- predictCMS(exp.mat = GSE25055.exprs)
 
 # Forest plot of hazard ratios for input genes
-plotHR(exp.mat = GSE25055.exprs, gene.symbol = sample(rownames(GSE25055.exprssion), 4),
-       pred = pred, time = GSE25055.clinical$DFS.month,
+plotHR(exp.mat = GSE25055.exprs, gene.symbol = c("FOXC1", "PCSK5", "CD19", "NAT1"),
+       pred = predictions, time = GSE25055.clinical$DFS.month,
        event = GSE25055.clinical$DFS.status, by.subtype = FALSE)
 
 # Subtype-specific forest plot of hazard ratios for input genes
-plotHR(exp.mat = GSE25055.exprs, gene.symbol = sample(rownames(GSE25055.exprssion), 4),
-       pred = pred, time = GSE25055.clinical$DFS.month,
+plotHR(exp.mat = GSE25055.exprs, gene.symbol = c("FOXC1", "PCSK5", "CD19", "NAT1"),
+       pred = predictions, time = GSE25055.clinical$DFS.month,
        event = GSE25055.clinical$DFS.status, by.subtype = TRUE)
 }

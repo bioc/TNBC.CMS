@@ -7,7 +7,8 @@
 predictCMS(exp.mat)
 }
 \arguments{
-\item{exp.mat}{A matrix of gene expression with genes in rows and samples in columns (rownames corresopnding to gene symbol).}
+\item{exp.mat}{A matrix of gene expression with genes in rows and samples 
+in columns (rownames corresopnding to gene symbol).}
 }
 \value{
 A vector of assigned subtypes.

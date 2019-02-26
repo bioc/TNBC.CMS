@@ -8,10 +8,10 @@ Maintainer: Doyeong Yu <nachoryu@ncc.re.kr>
 Description: This package implements a machine learning-based classifier for the assignment of consensus molecular subtypes to TNBC samples. It also provides functions to summarize genomic and clinical characteristics.
 License: GPL-3
 Encoding: UTF-8
-biocViews: Classification, Clustering, GeneExpression, SupportVectorMachine
+biocViews: Classification, Clustering, GeneExpression, GenePrediction, SupportVectorMachine
 LazyData: true
 RoxygenNote: 6.1.1
 Depends: R (>= 3.4.4), e1071, quadprog
-Imports: GSVA, pheatmap, grDevices, RColorBrewer, pracma, GGally, R.utils, forestplot, ggplot2, ggpubr, survival, grid, stats
+Imports: GSVA (>= 1.26.0), pheatmap, grDevices, RColorBrewer, pracma, GGally, R.utils, forestplot, ggplot2, ggpubr, survival, grid, stats
 Suggests: knitr
 VignetteBuilder:knitr

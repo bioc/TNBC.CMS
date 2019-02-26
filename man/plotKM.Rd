@@ -28,6 +28,6 @@ data(GSE25055.clinical)
 predictions <- predictCMS(exp.mat = GSE25055.exprs)
 
 # Plot Kaplan-Meier curves for each subtype
-plotKM(pred = predictions, time = GSE25055.clinical$DFS.months,
+plotKM(pred = predictions, time = GSE25055.clinical$DFS.month,
        event = GSE25055.clinical$DFS.status)
 }

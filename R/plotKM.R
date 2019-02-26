@@ -18,19 +18,19 @@
 #'predictions <- predictCMS(exp.mat = GSE25055.exprs)
 #'
 #'# Plot Kaplan-Meier curves for each subtype
-#'plotKM(pred = predictions, time = GSE25055.clinical$DFS.months,
+#'plotKM(pred = predictions, time = GSE25055.clinical$DFS.month,
 #'        event = GSE25055.clinical$DFS.status)
 plotKM <- function(pred, time, event){
-
-  pred <- factor(pred, levels = c("MSL", "IM", "LAR", "SL"))
-  CMS_palette <- c("MSL" = "brown2", "IM" = "gold2",
-                   "LAR" = "yellowgreen", "SL" = "midnightblue")
-  CMS_palette <- CMS_palette[unique(pred)]
-  surv.dat <- data.frame(CMS = pred, time = time, event = event)
-  km.CMS <- survfit(Surv(time, event == 1) ~ CMS, data = surv.dat)
-  ggsurv(km.CMS, surv.col = CMS_palette,
-         size.est = 1, order.legend = F, cens.size = 0) +
-    ylab("Eventless probability") + xlab("Follow-up time") +
-    theme_classic()
-
+    
+    pred <- factor(pred, levels = c("MSL", "IM", "LAR", "SL"))
+    CMS_palette <- c("MSL" = "brown2", "IM" = "gold2",
+                     "LAR" = "yellowgreen", "SL" = "midnightblue")
+    CMS_palette <- CMS_palette[unique(pred)]
+    surv.dat <- data.frame(CMS = pred, time = time, event = event)
+    km.CMS <- survfit(Surv(time, event == 1) ~ CMS, data = surv.dat)
+    ggsurv(km.CMS, surv.col = CMS_palette,
+           size.est = 1, order.legend = FALSE, cens.size = 0) +
+        ylab("Eventless probability") + xlab("Follow-up time") +
+        theme_classic()
+    
 }
