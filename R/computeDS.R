@@ -1,19 +1,19 @@
 #'Computation of drug signature scores.
 #'
-#'Computes drug signature scores. Also draws heatmap representing 
+#'Computes drug signature scores. Also draws heatmap representing
 #'the average signature scores for each subtype.
 #'
-#'@param exp.mat A matrix of gene expression with genes in rows and samples 
+#'@param exp.mat A matrix of gene expression with genes in rows and samples
 #'in columns (rownames corresopnding to gene symbol).
 #'@param pred A vector of predicted consensus molecular subtypes.
-#'@param gene.set A user-provided list of gene sets associated with 
-#'drug response. Names of gene sets must follow the format of 
+#'@param gene.set A user-provided list of gene sets associated with
+#'drug response. Names of gene sets must follow the format of
 #'[DRUG NAME]_[RESISTANCE/RESPONSE]_[UP/DN] (e.g. CISPLATIN_RESISTANCE_DN).
 #'@return A matrix of drug signature scores.
-#'@details Drug signature scores are the average of expression values of 
+#'@details Drug signature scores are the average of expression values of
 #'genes included in gene sets from MSigDB.
-#'@references Liberzon,A. et al. (2011) Molecular signatures database 
-#'(MSigDB) 3.0. \emph{Bioinformatics},27,1739-40.
+#'@references Liberzon, A. et al. (2011). Molecular signatures database
+#'(MSigDB) 3.0. \emph{Bioinformatics}, 27, 1739-40.
 #'@importFrom pheatmap pheatmap
 #'@importFrom grDevices colorRampPalette
 #'@importFrom RColorBrewer brewer.pal
@@ -28,21 +28,21 @@
 #'# Compute drug signature scores
 #'resultDS <- computeDS(exp.mat = GSE25055.exprs, pred = predictions)
 computeDS <- function(exp.mat, pred, gene.set = NULL){
-    
+
     pred <- factor(pred, levels = c("MSL", "IM", "LAR", "SL"))
     rbpal <- colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100)
-    CMS_palette <- c("MSL" = "brown2", "IM" = "gold2", 
+    CMS_palette <- c("MSL" = "brown2", "IM" = "gold2",
                      "LAR" = "yellowgreen", "SL" = "midnightblue")
-    
+
     computeSignature <- function(ds, gs){
-        
+
         gs.resistant <- ds[grep("RESISTANCE", ds)]
         gs.responsive = ds[grep("RESPONSE", ds)]
         gs.up <- c(gs.resistant[grep("_DN", gs.resistant)],
                    gs.responsive[grep("_UP", gs.responsive)])
         gs.down <- c(gs.resistant[grep("_UP", gs.resistant)],
                      gs.responsive[grep("_DN", gs.responsive)])
-        
+
         gene.up <- unique(unlist(gs[gs.up]))
         gene.down = unique(unlist(gs[gs.down]))
         score.up <- colMeans(exp.mat[gene.up,], na.rm = TRUE)
@@ -64,7 +64,7 @@ computeDS <- function(exp.mat, pred, gene.set = NULL){
             return(score.up - score.down)
         }
     }
-    
+
     if(!is.null(gene.set)){
         gn <- names(gene.set)
         drug.names <- unlist(strsplit(gn, split = "\\_"))
@@ -72,21 +72,21 @@ computeDS <- function(exp.mat, pred, gene.set = NULL){
         ds.dat <- t(sapply(drug.names,
                            function(x) computeSignature(gn[grep(x, gn)],
                                                         gene.set)))
-        
-        annotation_col <- data.frame(row.names = 
+
+        annotation_col <- data.frame(row.names =
                                          colnames(exp.mat)[order(pred)],
                                      CMS = pred[order(pred)])
-        
+
         pheatmap(ds.dat[,colnames(exp.mat)[order(pred)]], color = rbpal,
                  annotation_col = annotation_col, scale = "row",
                  annotation_colors = list(CMS = CMS_palette),
                  cluster_cols = FALSE, cluster_rows = FALSE, legend = TRUE,
                  annotation_names_col = FALSE, show_colnames = FALSE)
-        
+
         return(ds.dat)
-        
+
     }
-    
+
     ds.dat <- data.frame(row.names = colnames(exp.mat),
                          stringsAsFactors = FALSE)
     aplidin.gs <- c("MITSIADES_RESPONSE_TO_APLIDIN_UP",
@@ -125,18 +125,18 @@ computeDS <- function(exp.mat, pred, gene.set = NULL){
     ds.dat$TAMOXIFEN <- computeSignature(tamoxifen.gs, CGP.geneset)
     ds.dat$BEXAROTENE <- computeSignature(bexarotene.gs, CGP.geneset)
     ds.dat$DOXORUBICIN <- computeSignature(doxorubicin.gs, CGP.geneset)
-    
+
     ds.dat <- t(ds.dat)
-    
+
     annotation_col <- data.frame(row.names = colnames(exp.mat)[order(pred)],
                                  CMS = pred[order(pred)])
-    
+
     pheatmap(ds.dat[,colnames(exp.mat)[order(pred)]], color = rbpal,
              annotation_col = annotation_col, scale = "row",
              annotation_colors = list(CMS = CMS_palette),
              cluster_cols = FALSE, cluster_rows = FALSE, legend = TRUE,
              annotation_names_col = FALSE, show_colnames = FALSE)
-    
+
     return(ds.dat)
-    
+
 }

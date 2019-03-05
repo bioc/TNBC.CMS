@@ -1,50 +1,50 @@
 #'Computation of gene expression signature scores.
 #'
-#'Computes gene expression signature scores. Also draws boxplots 
+#'Computes gene expression signature scores. Also draws boxplots
 #'representing the average signature scores for each subtype.
 #'
-#'@param exp.mat A matrix of gene expression with genes in rows and samples 
+#'@param exp.mat A matrix of gene expression with genes in rows and samples
 #'in columns (rownames corresopnding to gene symbol).
 #'@param pred A vector of predicted consensus molecular subtypes.
-#'@param rnaseq logical to determine if input data is 
+#'@param rnaseq logical to determine if input data is
 #'RNA-Seq gene expression profile. By default, it is FALSE.
 #'@return A matrix of gene expression signature scores.
 #'@details
 #'
-#'\code{computeGES} calculates the following 7 gene expression 
+#'\code{computeGES} calculates the following 7 gene expression
 #'signature scores:
 #'\itemize{
-#'\item EMT (epithelial-mesenchymal transition): 
-#'average of expression values of genes included in the 
+#'\item EMT (epithelial-mesenchymal transition):
+#'average of expression values of genes included in the
 #'EMT signature published by \cite{Tan et al. (2014)}.
-#'\item Stromal: stromal score representing the presence of 
+#'\item Stromal: stromal score representing the presence of
 #'stromal cells in tumor tissues (computed using the ESTIMATE algorithm).
-#'\item Immune: immune score representing the presence of 
+#'\item Immune: immune score representing the presence of
 #'immune cells in tumor tissues (computed using the ESTIMATE algorithm).
-#'\item Microenvironment: microenvironment score representing the sum 
+#'\item Microenvironment: microenvironment score representing the sum
 #'of all immune and stromal cell types (computed using xCell)
-#'\item Stemness: stemness index computed using the method developed by 
+#'\item Stemness: stemness index computed using the method developed by
 #'\cite{Malta et al. (2018)}.
 #'\item Hormone: average of expression values of AR, ERBB2, ESR1, and PGR.
-#'\item CIN (chromosomal instability): average of expression values of genes 
+#'\item CIN (chromosomal instability): average of expression values of genes
 #'included in the CIN70 signature published by \cite{Carter et al. (2006)}.
 #'}
 #'
-#'@references Aran,D. et al. (2017) xCell: digitally portraying 
-#'the tissue cellular heterogeneity landscape. \emph{Genome biology},18,220.
-#'@references Carter,S.L. et al. (2006) A signature of chromosomal 
-#'instability inferred from gene expression profiles predicts 
-#'clinical outcome in multiple human cancers. \emph{Nature genetics},38,1043.
-#'@references Malta,T.M. et al. (2018) Machine learning 
-#'identifies stemness features associated with 
-#'oncogenic dedifferentiation. \emph{Cell},173,338-354.
-#'@references Tan,T.Z. et al. (2014) Epithelial-mesenchymal 
-#'transition spectrum quantification and its efficacy in deciphering 
-#'survival and drug responses of cancer 
-#'patients. \emph{EMBO molecular medicine},6,1279-93.
-#'@references Yoshihara,K. et al. (2013) Inferring 
-#'tumour purity and stromal and immune cell admixture 
-#'from expression data. \emph{Nature communications},4,2612.
+#'@references Aran, D. et al. (2017). xCell: digitally portraying
+#'the tissue cellular heterogeneity landscape. \emph{Genome biology}, 18, 220.
+#'@references Carter, S.L. et al. (2006). A signature of chromosomal
+#'instability inferred from gene expression profiles predicts
+#'clinical outcome in multiple human cancers. \emph{Nature genetics}, 38, 1043.
+#'@references Malta, T.M. et al. (2018). Machine learning
+#'identifies stemness features associated with
+#'oncogenic dedifferentiation. \emph{Cell}, 173, 338-354.
+#'@references Tan, T.Z. et al. (2014). Epithelial-mesenchymal
+#'transition spectrum quantification and its efficacy in deciphering
+#'survival and drug responses of cancer
+#'patients. \emph{EMBO molecular medicine}, 6, 1279-93.
+#'@references Yoshihara, K. et al. (2013). Inferring
+#'tumour purity and stromal and immune cell admixture
+#'from expression data. \emph{Nature communications}, 4, 2612.
 #'
 #'@importFrom pheatmap pheatmap
 #'@importFrom grDevices colorRampPalette
@@ -64,10 +64,10 @@
 #'# Compute gene expression signature scores
 #'resultGES <- computeGES(exp.mat = GSE25055.exprs, pred = predictions, rnaseq = FALSE)
 computeGES <- function(exp.mat, pred, rnaseq = FALSE){
-    
+
     CMS.palette <- c("MSL" = "brown2", "IM" = "gold2",
                      "LAR" = "yellowgreen", "SL" = "midnightblue")
-    
+
     pred <- factor(pred, levels = c("MSL", "IM", "LAR", "SL"))
     EMT.score <- colMeans(exp.mat[rownames(exp.mat) %in% EMT.geneset,])
     CIN.score <- colMeans(exp.mat[rownames(exp.mat) %in% CIN.geneset,])
@@ -88,58 +88,58 @@ computeGES <- function(exp.mat, pred, rnaseq = FALSE){
                      hormone.score, CIN.score)
     rownames(sig.mat) <- c("EMT", "Stromal", "Immune", "Microenvironment",
                            "Stemness", "Hormone", "CIN")
-    
+
     pval1 <- pval2 <- pval3 <- pval4 <- NA
     if(length(unique(pred)) > 1){
-        
+
         if("MSL" %in% as.character(pred)){
-            pval1 <- wilcox.test(stromal.score ~ 
+            pval1 <- wilcox.test(stromal.score ~
                                      ifelse(pred == "MSL", 1, 0))$p.value
         }
         if("IM" %in% as.character(pred)){
-            pval2 <- wilcox.test(immune.score ~ 
+            pval2 <- wilcox.test(immune.score ~
                                      ifelse(pred == "IM", 1, 0))$p.value
         }
         if("LAR" %in% as.character(pred)){
-            pval3 <- wilcox.test(hormone.score ~ 
+            pval3 <- wilcox.test(hormone.score ~
                                      ifelse(pred == "LAR", 1, 0))$p.value
         }
         if("SL" %in% as.character(pred)){
-            pval4 <- wilcox.test(stemness.score ~ 
+            pval4 <- wilcox.test(stemness.score ~
                                      ifelse(pred == "SL", 1, 0))$p.value
         }
-        
+
     }
-    
+
     sub1 <- sub2 <- sub3 <- sub4 <- ""
-    
+
     if(!is.na(pval1)){
         sub1 <- bquote(paste("Wilcoxon (MSL vs. others) ",
                              italic(p), " = ", .(format(pval1, digits = 2))))
     }
-    
+
     if(!is.na(pval2)){
         sub2 <- bquote(paste("Wilcoxon (IM vs. others) ",
                              italic(p), " = ", .(format(pval2, digits = 2))))
     }
-    
+
     if(!is.na(pval3)){
         sub3 <- bquote(paste("Wilcoxon (LAR vs. others) ",
                              italic(p), " = ", .(format(pval3, digits = 2))))
     }
-    
+
     if(!is.na(pval4)){
         sub4 <- bquote(paste("Wilcoxon (SL vs. others) ",
                              italic(p), " = ", .(format(pval4, digits = 2))))
     }
-    
+
     TITLE_SIZE <- 12
     SUBTITLE_SIZE <- 10
-    
+
     sigdat <- data.frame(CMS = pred, Stromal = stromal.score,
                          Immune = immune.score, Hormone = hormone.score,
                          Stem = stemness.score)
-    
+
     p1 <- ggboxplot(sigdat, x = "CMS", y = "Stromal",
                     fill = "CMS", palette = CMS.palette) +
         theme_bw() + labs(title = "Stromal", subtitle = sub1) +
@@ -149,7 +149,7 @@ computeGES <- function(exp.mat, pred, rnaseq = FALSE){
               plot.title = element_text(size = TITLE_SIZE,
                                         hjust = 0.5, face = "bold"),
               plot.subtitle = element_text(size=  SUBTITLE_SIZE, hjust = 0.5))
-    
+
     p2 <- ggboxplot(sigdat, x = "CMS", y = "Immune",
                     fill = "CMS", palette = CMS.palette) +
         theme_bw() + labs(title = "Immune", subtitle = sub2) +
@@ -159,7 +159,7 @@ computeGES <- function(exp.mat, pred, rnaseq = FALSE){
               plot.title = element_text(size = TITLE_SIZE,
                                         hjust = 0.5, face = "bold"),
               plot.subtitle = element_text(size=  SUBTITLE_SIZE, hjust = 0.5))
-    
+
     p3 <- ggboxplot(sigdat, x = "CMS", y = "Hormone",
                     fill = "CMS", palette = CMS.palette) +
         theme_bw() + labs(title = "Hormone", subtitle = sub3) +
@@ -169,7 +169,7 @@ computeGES <- function(exp.mat, pred, rnaseq = FALSE){
               plot.title = element_text(size = TITLE_SIZE,
                                         hjust = 0.5, face = "bold"),
               plot.subtitle = element_text(size=  SUBTITLE_SIZE, hjust = 0.5))
-    
+
     p4 <- ggboxplot(sigdat, x = "CMS", y = "Stem",
                     fill = "CMS", palette = CMS.palette) +
         theme_bw() + labs(title = "Stem", subtitle = sub4) +
@@ -179,7 +179,7 @@ computeGES <- function(exp.mat, pred, rnaseq = FALSE){
               plot.title = element_text(size = TITLE_SIZE,
                                         hjust = 0.5, face = "bold"),
               plot.subtitle = element_text(size=  SUBTITLE_SIZE, hjust = 0.5))
-    
+
     g1 <- ggplotGrob(p1)
     g2 <- ggplotGrob(p2)
     g3 <- ggplotGrob(p3)
@@ -188,20 +188,20 @@ computeGES <- function(exp.mat, pred, rnaseq = FALSE){
                rbind(g2,  g4, size = "first"), size = "first")
     grid.newpage()
     grid.draw(g)
-    
+
     return(sig.mat)
-    
+
 }
 
 #'Computation of microenvironment score
 #'
-#'Computes microenvironment score. This function wraps around 
-#'the \code{xCellAnalysis} function of the \code{xCell} package to 
+#'Computes microenvironment score. This function wraps around
+#'the \code{xCellAnalysis} function of the \code{xCell} package to
 #'compute microenvironment score.
 #'
-#'@param mat A matrix of gene expression with genes in rows and 
+#'@param mat A matrix of gene expression with genes in rows and
 #'samples in columns (rownames corresopnding to gene symbol).
-#'@param rnaseq logical to determine if input data is 
+#'@param rnaseq logical to determine if input data is
 #'RNA-Seq gene expression profile
 #'@return A data frame containing stromal and immune scores
 #'@importFrom GSVA gsva
@@ -210,7 +210,7 @@ computeGES <- function(exp.mat, pred, rnaseq = FALSE){
 #'@import quadprog
 #'@keywords internal
 computexCellScore <- function(mat, rnaseq){
-    
+
     signatures <- xCell.data$signatures
     genes <- xCell.data$genes
     if(rnaseq){
@@ -218,7 +218,7 @@ computexCellScore <- function(mat, rnaseq){
     } else{
         spill <- xCell.data$spill.array
     }
-    
+
     #Compute enrichment scores
     shared.genes <- intersect(rownames(mat), genes)
     expr <- mat[shared.genes,]
@@ -231,7 +231,7 @@ computexCellScore <- function(mat, rnaseq){
     agg <- aggregate(scores ~ cell.types, FUN = mean)
     rownames(agg) <- agg[, 1]
     scores <- agg[, -1]
-    
+
     #Transform scores
     rows <- rownames(scores)[rownames(scores) %in% rownames(spill$fv)]
     tscores <- scores[rows, ]
@@ -240,7 +240,7 @@ computexCellScore <- function(mat, rnaseq){
     tscores <- (as.matrix(tscores) - minX)/5000
     tscores[tscores < 0] <- 0
     tscores <- (tscores^spill$fv[A,2])/(spill$fv[A,3]*2)
-    
+
     #Adjust scores
     K <- spill$K * 0.5
     diag(K) <- 1
@@ -250,7 +250,7 @@ computexCellScore <- function(mat, rnaseq){
                                                                x, lb = 0))
     ascores[ascores<0] <- 0
     rownames(ascores) <- rows
-    
+
     #Compute microenvironment scores
     immune.score <- apply(ascores[c('B-cells','CD4+ T-cells',
                                     'CD8+ T-cells','DC','Eosinophils',
@@ -259,21 +259,21 @@ computexCellScore <- function(mat, rnaseq){
     stromal.score <- apply(ascores[c('Adipocytes','Endothelial cells',
                                      'Fibroblasts'),],2,sum)/2
     microenvironment.score <- immune.score + stromal.score
-    
+
     microenvironment.score
 }
 
 #'Computation of stromal and immune scores
 #'
-#'Computes stromal and immune scores. This function was borrowed from 
+#'Computes stromal and immune scores. This function was borrowed from
 #'the \code{estimate} package and modified to accept R object as input.
 #'
-#'@param mat A matrix of gene expression with genes in rows and 
+#'@param mat A matrix of gene expression with genes in rows and
 #'samples in columns (rownames corresopnding to gene symbol).
 #'@return A data frame containing stromal and immune scores
 #'@keywords internal
 computeESTIMATEscore <- function(mat){
-    
+
     m <- mat
     gene.names <- rownames(mat)
     sample.names <- colnames(mat)
@@ -332,5 +332,5 @@ computeESTIMATEscore <- function(mat){
     names(score.data) <- sample.names
     row.names(score.data) <- gs.names
     score.data
-    
+
 }

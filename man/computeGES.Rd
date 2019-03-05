@@ -7,38 +7,38 @@
 computeGES(exp.mat, pred, rnaseq = FALSE)
 }
 \arguments{
-\item{exp.mat}{A matrix of gene expression with genes in rows and samples 
+\item{exp.mat}{A matrix of gene expression with genes in rows and samples
 in columns (rownames corresopnding to gene symbol).}
 
 \item{pred}{A vector of predicted consensus molecular subtypes.}
 
-\item{rnaseq}{logical to determine if input data is 
+\item{rnaseq}{logical to determine if input data is
 RNA-Seq gene expression profile. By default, it is FALSE.}
 }
 \value{
 A matrix of gene expression signature scores.
 }
 \description{
-Computes gene expression signature scores. Also draws boxplots 
+Computes gene expression signature scores. Also draws boxplots
 representing the average signature scores for each subtype.
 }
 \details{
-\code{computeGES} calculates the following 7 gene expression 
+\code{computeGES} calculates the following 7 gene expression
 signature scores:
 \itemize{
-\item EMT (epithelial-mesenchymal transition): 
-average of expression values of genes included in the 
+\item EMT (epithelial-mesenchymal transition):
+average of expression values of genes included in the
 EMT signature published by \cite{Tan et al. (2014)}.
-\item Stromal: stromal score representing the presence of 
+\item Stromal: stromal score representing the presence of
 stromal cells in tumor tissues (computed using the ESTIMATE algorithm).
-\item Immune: immune score representing the presence of 
+\item Immune: immune score representing the presence of
 immune cells in tumor tissues (computed using the ESTIMATE algorithm).
-\item Microenvironment: microenvironment score representing the sum 
+\item Microenvironment: microenvironment score representing the sum
 of all immune and stromal cell types (computed using xCell)
-\item Stemness: stemness index computed using the method developed by 
+\item Stemness: stemness index computed using the method developed by
 \cite{Malta et al. (2018)}.
 \item Hormone: average of expression values of AR, ERBB2, ESR1, and PGR.
-\item CIN (chromosomal instability): average of expression values of genes 
+\item CIN (chromosomal instability): average of expression values of genes
 included in the CIN70 signature published by \cite{Carter et al. (2006)}.
 }
 }
@@ -53,23 +53,23 @@ predictions <- predictCMS(exp.mat = GSE25055.exprs)
 resultGES <- computeGES(exp.mat = GSE25055.exprs, pred = predictions, rnaseq = FALSE)
 }
 \references{
-Aran,D. et al. (2017) xCell: digitally portraying 
-the tissue cellular heterogeneity landscape. \emph{Genome biology},18,220.
+Aran, D. et al. (2017). xCell: digitally portraying
+the tissue cellular heterogeneity landscape. \emph{Genome biology}, 18, 220.
 
-Carter,S.L. et al. (2006) A signature of chromosomal 
-instability inferred from gene expression profiles predicts 
-clinical outcome in multiple human cancers. \emph{Nature genetics},38,1043.
+Carter, S.L. et al. (2006). A signature of chromosomal
+instability inferred from gene expression profiles predicts
+clinical outcome in multiple human cancers. \emph{Nature genetics}, 38, 1043.
 
-Malta,T.M. et al. (2018) Machine learning 
-identifies stemness features associated with 
-oncogenic dedifferentiation. \emph{Cell},173,338-354.
+Malta, T.M. et al. (2018). Machine learning
+identifies stemness features associated with
+oncogenic dedifferentiation. \emph{Cell}, 173, 338-354.
 
-Tan,T.Z. et al. (2014) Epithelial-mesenchymal 
-transition spectrum quantification and its efficacy in deciphering 
-survival and drug responses of cancer 
-patients. \emph{EMBO molecular medicine},6,1279-93.
+Tan, T.Z. et al. (2014). Epithelial-mesenchymal
+transition spectrum quantification and its efficacy in deciphering
+survival and drug responses of cancer
+patients. \emph{EMBO molecular medicine}, 6, 1279-93.
 
-Yoshihara,K. et al. (2013) Inferring 
-tumour purity and stromal and immune cell admixture 
-from expression data. \emph{Nature communications},4,2612.
+Yoshihara, K. et al. (2013). Inferring
+tumour purity and stromal and immune cell admixture
+from expression data. \emph{Nature communications}, 4, 2612.
 }

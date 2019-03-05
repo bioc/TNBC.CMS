@@ -7,14 +7,14 @@
 computeESTIMATEscore(mat)
 }
 \arguments{
-\item{mat}{A matrix of gene expression with genes in rows and 
+\item{mat}{A matrix of gene expression with genes in rows and
 samples in columns (rownames corresopnding to gene symbol).}
 }
 \value{
 A data frame containing stromal and immune scores
 }
 \description{
-Computes stromal and immune scores. This function was borrowed from 
+Computes stromal and immune scores. This function was borrowed from
 the \code{estimate} package and modified to accept R object as input.
 }
 \keyword{internal}

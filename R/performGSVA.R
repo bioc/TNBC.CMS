@@ -2,27 +2,27 @@
 #'
 #'Performs GSVA on gene sets. Also draws a heatmap representing GSVA scores.
 #'
-#'@param exp.mat A matrix of gene expression with genes in rows and 
+#'@param exp.mat A matrix of gene expression with genes in rows and
 #'samples in columns (rownames corresopnding to gene symbol).
 #'@param pred A vector of predicted consensus molecular subtypes.
-#'@param gene.set Gene sets provided as a list. If NULL, 
+#'@param gene.set Gene sets provided as a list. If NULL,
 #'the hallmark pathway gene sets are used.
-#'@param gsva.kcdf Kernel to be used in the estimation of 
-#'the cumulative distribution function. By default, 
-#'this is set to \code{"Gaussian"} which is suitable 
-#'for continuous expression values. If expression values 
+#'@param gsva.kcdf Kernel to be used in the estimation of
+#'the cumulative distribution function. By default,
+#'this is set to \code{"Gaussian"} which is suitable
+#'for continuous expression values. If expression values
 #'are counts, \code{"Poisson"} is recommended.
 #'@return A matrix of GSVA enrichment scores.
-#'@details This is a wrapper function of the \code{gsva} 
-#'function in the \code{GSVA} package to compute GSVA 
-#'enrichment scores per sample and produce a heatmap 
+#'@details This is a wrapper function of the \code{gsva}
+#'function in the \code{GSVA} package to compute GSVA
+#'enrichment scores per sample and produce a heatmap
 #'comparing them across consensus molecular subtypes.
 #'@importFrom GSVA gsva
 #'@importFrom pheatmap pheatmap
 #'@importFrom grDevices colorRampPalette
 #'@importFrom RColorBrewer brewer.pal
-#'@references Liberzon,A. et al. (2015) The molecular signatures 
-#'database hallmark gene set collection. \emph{Cell systems},1,417-425.
+#'@references Liberzon, A. et al. (2015). The molecular signatures
+#'database hallmark gene set collection. \emph{Cell systems}, 1, 417-425.
 #'@export
 #'@examples
 #'# Load gene expression profiles of TNBC samples
@@ -34,7 +34,7 @@
 #'# Perform GSVA on the hallmark pathway gene sets
 #'resultGSVA <- performGSVA(exp.mat = GSE25055.exprs, pred = predictions)
 performGSVA <- function(exp.mat, pred, gene.set = NULL, gsva.kcdf = "Gaussian"){
-    
+
     pred <- factor(pred, levels = c("MSL", "IM", "LAR", "SL"))
     CMS_palette <- c("MSL" = "brown2", "IM" = "gold2",
                      "LAR" = "yellowgreen", "SL" = "midnightblue")
@@ -42,7 +42,7 @@ performGSVA <- function(exp.mat, pred, gene.set = NULL, gsva.kcdf = "Gaussian"){
     if(!is.null(gene.set)){
         GSVA.score <- gsva(as.matrix(exp.mat), gene.set,
                            kcdf = "Gaussian", verbose = FALSE)
-        annotation_col <- data.frame(row.names = 
+        annotation_col <- data.frame(row.names =
                                          colnames(exp.mat)[order(pred)],
                                      CMS = pred[order(pred)])
         pheatmap(GSVA.score[, colnames(exp.mat)[order(pred)]],
@@ -53,7 +53,7 @@ performGSVA <- function(exp.mat, pred, gene.set = NULL, gsva.kcdf = "Gaussian"){
                  annotation_names_col = FALSE, show_colnames = FALSE)
         return(GSVA.score)
     }
-    
+
     GSVA.score <- gsva(as.matrix(exp.mat), Hallmark.geneset,
                        kcdf = "Gaussian", verbose = FALSE)
     rownames(GSVA.score) <- sapply(rownames(GSVA.score),
@@ -84,7 +84,7 @@ performGSVA <- function(exp.mat, pred, gene.set = NULL, gsva.kcdf = "Gaussian"){
              annotation_colors = list(CMS = CMS_palette),
              cluster_cols = FALSE, cluster_rows = FALSE, legend = TRUE,
              annotation_names_col = FALSE, show_colnames = FALSE)
-    
+
     return(GSVA.score[c(MSL.pathway, IM.pathway, LAR.pathway, SL.pathway),])
-    
+
 }
