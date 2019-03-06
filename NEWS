@@ -1,4 +1,11 @@
-TNBC.CMS version 0.99.1
+TNBC.CMS version 0.99.3
+==============
+
+Changes:
+
+* Reduced the number of cores used in GSVA 
+
+TNBC.CMS version 0.99.2
 ==============
 
 Changes:
