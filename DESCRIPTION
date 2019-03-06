@@ -2,7 +2,7 @@ Package: TNBC.CMS
 Type: Package
 Date: 2019-03-06
 Title: TNBC.CMS: Prediction of TNBC Consensus Molecular Subtypes 
-Version: 0.99.6
+Version: 0.99.7
 Author: Doyeong Yu, Jihyun Kim, In Hae Park, Charny Park 
 Maintainer: Doyeong Yu <nachoryu@ncc.re.kr>
 Description: This package implements a machine learning-based classifier for the assignment of consensus molecular subtypes to TNBC samples. It also provides functions to summarize genomic and clinical characteristics.
