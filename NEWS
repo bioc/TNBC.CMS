@@ -3,6 +3,13 @@ TNBC.CMS version 0.99.1
 
 Changes:
 
+* Fixed errors and warnings. 
+
+TNBC.CMS version 0.99.1
+==============
+
+Changes:
+
 * Modified a vignette to use the package data instead of the external data.
 
 

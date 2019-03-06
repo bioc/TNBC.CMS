@@ -28,12 +28,12 @@
 #'predictions <- predictCMS(exp.mat = GSE25055.exprs)
 #'
 #'# Forest plot of hazard ratios for input genes
-#'plotHR(exp.mat = GSE25055.exprs, gene.symbol = c("FOXC1", "PCSK5", "CD19", "NAT1"),
+#'plotHR(exp.mat = GSE25055.exprs, gene.symbol = c("RECK", "RELN", "EHD4", "PRRX2"),
 #'        pred = predictions, time = GSE25055.clinical$DFS.month,
 #'        event = GSE25055.clinical$DFS.status, by.subtype = FALSE)
 #'
 #'# Subtype-specific forest plot of hazard ratios for input genes
-#'plotHR(exp.mat = GSE25055.exprs, gene.symbol = c("FOXC1", "PCSK5", "CD19", "NAT1"),
+#'plotHR(exp.mat = GSE25055.exprs, gene.symbol = c("RECK", "RELN", "EHD4", "PRRX2"),
 #'        pred = predictions, time = GSE25055.clinical$DFS.month,
 #'        event = GSE25055.clinical$DFS.status, by.subtype = TRUE)
 plotHR <- function(exp.mat, gene.symbol, pred, time, event, by.subtype = TRUE){

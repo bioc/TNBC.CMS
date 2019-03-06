@@ -224,7 +224,7 @@ computexCellScore <- function(mat, rnaseq){
     expr <- mat[shared.genes,]
     expr <- apply(expr, 2, rank)
     scores <- gsva(expr, signatures, method = "ssgsea", ssgsea.norm = FALSE,
-                   parallel.sz = 4, verbose = FALSE)
+                   parallel.sz = 1, verbose = FALSE)
     scores <- scores - apply(scores, 1, min)
     cell.types <- unlist(strsplit(rownames(scores), "%"))
     cell.types <- cell.types[seq(1, length(cell.types), 3)]

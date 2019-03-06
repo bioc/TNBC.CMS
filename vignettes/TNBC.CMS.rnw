@@ -72,7 +72,7 @@ We filtered out samples which seemed to be positive for ER, PR,
 and HER2 based on immunohistochemistry results and the distribution of 
 gene expression.\paragraph{}
 First, we load the package and the processed expression data. The dataset 
-includes a total of 12,722 genes and 73 samples. Note that rows and columns 
+includes a total of 4,746 genes and 73 samples. Note that rows and columns 
 correspond to genes and samples, and row names must be gene symbols.
 <<loadPackagesAndData>>=
 library(TNBC.CMS)
@@ -163,8 +163,7 @@ library(survival)
 
 #Test for difference of survival between low and high expression groups
 surv <- Surv(time, event)
-exprs <- GSE25055.exprs[apply(GSE25055.exprs, 1, var) > 0.5, ]
-chisq <- apply(exprs, 1, function(x) survdiff(surv ~ (x > median(x)))$chisq)
+chisq <- apply(GSE25055.exprs, 1, function(x) survdiff(surv ~ (x > median(x)))$chisq)
 pval <- 1 - pchisq(chisq, 1)
 
 #Select 10 genes with lowest p-values for the log-rank test
@@ -196,7 +195,7 @@ the \texttt{gene.set} argument. Note that names of gene sets must follow
 the format of [DRUG NAME]{\_}[RESPONSE/RESISTANCE]{\_}[UP/DN] 
 (e.g. CISPLATIN{\_}RESISTANCE{\_}UP).\paragraph{}
 Figure 6 shows a heatmap of drug signature scores for each sample. 
-The MSL and SL subtypes appear to be resistant to cisplatin and doxorubicin, 
+The MSL and SL subtypes appear to be resistant to dasatinib and doxorubicin, 
 respectively. Also, the IM and LAR subtypes show higher levels of signature 
 scores for androgen agonist and SB216763 (an inhibitor of GSK3B) 
 than other subtypes, respectively.
@@ -216,7 +215,7 @@ and characterization into a data frame and save it into a text file.
 dfCMS <- data.frame(row.names = colnames(GSE25055.exprs), CMS = predictions, t(resultGES),
                     t(resultDS), stringsAsFactors = FALSE)
 head(dfCMS)
-write.table(dfCMS, file = "GSe25055_CMS.txt")
+write.table(dfCMS, file = "GSE25055_CMS.txt")
 @
 
 %------------------------------------------------------------
