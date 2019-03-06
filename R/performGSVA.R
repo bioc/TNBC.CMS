@@ -54,7 +54,7 @@ performGSVA <- function(exp.mat, pred, gene.set = NULL, gsva.kcdf = "Gaussian"){
         return(GSVA.score)
     }
 
-    GSVA.score <- gsva(as.matrix(exp.mat), Hallmark.geneset,
+    GSVA.score <- gsva(as.matrix(exp.mat), Hallmark.geneset, parallel.sz = 1,
                        kcdf = "Gaussian", verbose = FALSE)
     rownames(GSVA.score) <- sapply(rownames(GSVA.score),
                                    function(x) substr(x, 10, nchar(x)))
