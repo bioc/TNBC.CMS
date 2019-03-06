@@ -18,8 +18,8 @@
 #'data(GSE25055)
 #'
 #'# Predict consensus molecular subtypes of TNBC samples
-#'predictions <- predictCMS(expr = GSE25055)
-#'table(predictions)
+#'prediction <- predictCMS(expr = GSE25055)
+#'table(prediction)
 predictCMS <- function(expr){
 
   if (is(expr, "SummarizedExperiment")){

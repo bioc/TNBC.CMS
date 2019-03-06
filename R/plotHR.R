@@ -31,16 +31,16 @@
 #'DFS.month <- colData(GSE25055)$DFS.month
 #'
 #'# Predict consensus molecular subtypes of TNBC samples
-#'predictions <- predictCMS(expr = GSE25055)
+#'prediction <- predictCMS(expr = GSE25055)
 #'
 #'# Forest plot of hazard ratios for input genes
 #'plotHR(expr = GSE25055, gene.symbol = c("RECK", "RELN", "EHD4", "PRRX2"),
-#'        pred = predictions, time = DFS.month, event = DFS.status,
+#'        pred = prediction, time = DFS.month, event = DFS.status,
 #'        by.subtype = FALSE)
 #'
 #'# Subtype-specific forest plot of hazard ratios for input genes
 #'plotHR(expr = GSE25055, gene.symbol = c("RECK", "RELN", "EHD4", "PRRX2"),
-#'        pred = predictions, time = DFS.month, event = DFS.status,
+#'        pred = prediction, time = DFS.month, event = DFS.status,
 #'        by.subtype = TRUE)
 plotHR <- function(expr, gene.symbol, pred, time, event, by.subtype = TRUE){
 

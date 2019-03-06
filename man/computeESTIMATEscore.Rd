@@ -15,6 +15,6 @@ A data frame containing stromal and immune scores
 }
 \description{
 Computes stromal and immune scores. This function was borrowed from
-the \code{estimate} package and modified to accept R object as input.
+the \code{estimate} package and changed to accept R object as input.
 }
 \keyword{internal}

@@ -41,10 +41,10 @@ comparing them across consensus molecular subtypes.
 data(GSE25055)
 
 # Predict consensus molecular subtypes of TNBC samples
-predictions <- predictCMS(expr = GSE25055)
+prediction <- predictCMS(expr = GSE25055)
 
 # Perform GSVA on the hallmark pathway gene sets
-resultGSVA <- performGSVA(expr = GSE25055, pred = predictions)
+resultGSVA <- performGSVA(expr = GSE25055, pred = prediction)
 }
 \references{
 Liberzon, A. et al. (2015). The molecular signatures

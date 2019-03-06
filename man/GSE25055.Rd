@@ -9,7 +9,7 @@ This is a TNBC microarray dataset from GSE25055 contained in a
 \code{SummarizedExperiment} object. It includes gene expression profiles and
 clinical information which can be accessed by the \code{assays} and
 \code{colData} functions, respectively.
-We obtained gene expression profiles of entire breast cancer
+We obtained gene expression profiles of breast cancer
 samples from the \code{curatedBreastData} package and extracted
 TNBC samples based on the expression profiles and
 immunohistochemistry results.

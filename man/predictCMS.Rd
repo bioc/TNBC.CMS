@@ -24,6 +24,6 @@ Predicts the TNBC consensus molecular subtype of TNBC samples.
 data(GSE25055)
 
 # Predict consensus molecular subtypes of TNBC samples
-predictions <- predictCMS(expr = GSE25055)
-table(predictions)
+prediction <- predictCMS(expr = GSE25055)
+table(prediction)
 }

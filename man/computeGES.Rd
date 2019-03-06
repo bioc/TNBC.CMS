@@ -50,10 +50,10 @@ included in the CIN70 signature published by \cite{Carter et al. (2006)}.
 data(GSE25055)
 
 # Predict consensus molecular subtypes of TNBC samples
-predictions <- predictCMS(expr = GSE25055)
+prediction <- predictCMS(expr = GSE25055)
 
 # Compute gene expression signature scores
-resultGES <- computeGES(expr = GSE25055, pred = predictions, rnaseq = FALSE)
+resultGES <- computeGES(expr = GSE25055, pred = prediction, rnaseq = FALSE)
 }
 \references{
 Aran, D. et al. (2017). xCell: digitally portraying

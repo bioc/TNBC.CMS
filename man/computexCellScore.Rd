@@ -17,8 +17,8 @@ RNA-Seq gene expression profile}
 A data frame containing stromal and immune scores
 }
 \description{
-Computes microenvironment score. This function wraps around
+Computes a microenvironment score. This function wraps around
 the \code{xCellAnalysis} function of the \code{xCell} package to
-compute microenvironment score.
+compute a microenvironment score.
 }
 \keyword{internal}

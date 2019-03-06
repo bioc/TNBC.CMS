@@ -38,7 +38,7 @@ National Cancer Center, Gyeonggi-do, Republic of Korea}
 \affil[2]{Center for Breast Cancer, Hospital, National Cancer Center,
 Gyeonggi-do, Republic of Korea}
 
-\date{March 07, 2019}
+\date{March 06, 2019}
 \maketitle
 \tableofcontents
 \pagebreak

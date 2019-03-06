@@ -28,10 +28,10 @@
 #'data(GSE25055)
 #'
 #'# Predict consensus molecular subtypes of TNBC samples
-#'predictions <- predictCMS(expr = GSE25055)
+#'prediction <- predictCMS(expr = GSE25055)
 #'
 #'# Compute drug signature scores
-#'resultDS <- computeDS(expr = GSE25055, pred = predictions)
+#'resultDS <- computeDS(expr = GSE25055, pred = prediction)
 computeDS <- function(expr, pred, gene.set = NULL){
 
   if (is(expr, "SummarizedExperiment")){

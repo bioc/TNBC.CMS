@@ -64,10 +64,10 @@
 #'data(GSE25055)
 #'
 #'# Predict consensus molecular subtypes of TNBC samples
-#'predictions <- predictCMS(expr = GSE25055)
+#'prediction <- predictCMS(expr = GSE25055)
 #'
 #'# Compute gene expression signature scores
-#'resultGES <- computeGES(expr = GSE25055, pred = predictions, rnaseq = FALSE)
+#'resultGES <- computeGES(expr = GSE25055, pred = prediction, rnaseq = FALSE)
 computeGES <- function(expr, pred, rnaseq = FALSE){
 
   if (is(expr, "SummarizedExperiment")){
@@ -206,9 +206,9 @@ computeGES <- function(expr, pred, rnaseq = FALSE){
 
 #'Computation of microenvironment score
 #'
-#'Computes microenvironment score. This function wraps around
+#'Computes a microenvironment score. This function wraps around
 #'the \code{xCellAnalysis} function of the \code{xCell} package to
-#'compute microenvironment score.
+#'compute a microenvironment score.
 #'
 #'@param mat A matrix of gene expression with genes in rows and
 #'samples in columns (rownames corresopnding to gene symbol).
@@ -277,7 +277,7 @@ computexCellScore <- function(mat, rnaseq){
 #'Computation of stromal and immune scores
 #'
 #'Computes stromal and immune scores. This function was borrowed from
-#'the \code{estimate} package and modified to accept R object as input.
+#'the \code{estimate} package and changed to accept R object as input.
 #'
 #'@param mat A matrix of gene expression with genes in rows and
 #'samples in columns (rownames corresopnding to gene symbol).

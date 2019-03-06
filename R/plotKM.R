@@ -16,10 +16,10 @@
 #'DFS.month <- colData(GSE25055)$DFS.month
 #'
 #'# Predict consensus molecular subtypes of TNBC samples
-#'predictions <- predictCMS(expr = GSE25055)
+#'prediction <- predictCMS(expr = GSE25055)
 #'
 #'# Plot Kaplan-Meier curves for each subtype
-#'plotKM(pred = predictions, time = DFS.month, event = DFS.status)
+#'plotKM(pred = prediction, time = DFS.month, event = DFS.status)
 plotKM <- function(pred, time, event){
 
   pred <- factor(pred, levels = c("MSL", "IM", "LAR", "SL"))
