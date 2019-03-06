@@ -13,8 +13,8 @@ the \code{curatedBreastData} package.
 https://bioconductor.org/packages/release/data/experiment/html/curatedBreastData.html
 }
 \references{
-Curtis, C. et al. (2012). The genomic and transcriptomic architecture of 2,000 breast tumours
-reveals novel subgroups. \emph{Nature}, 486, 346.
+Hatzis, C. et al. (2011). A genomic predictor of response and survival following 
+taxane-anthracycline chemotherapy for invasive breast cancer \emph{JAMA}, 305, 1873-81.
 }
 \examples{
 data(GSE25055.clinical)

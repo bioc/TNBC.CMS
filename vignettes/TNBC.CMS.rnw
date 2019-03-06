@@ -60,25 +60,25 @@ drug responses.
 \section{Loading package and dataset for case studies}
 %------------------------------------------------------------
 To install the \texttt{TNBC.CMS} package, enter the following commands:
-<<installAndLoadPackages,results='hide',message=FALSE>>=
+<<installAndLoadPackages,eval=FALSE,results='hide',message=FALSE>>=
 source("http://bioconductor.org/biocLite.R")
 biocLite("TNBC.CMS")
 @
 
-In this vignette, we walk through a case study of the METABRIC (Molecular 
-Taxonomy of Breast Cancer Internation Consortium) dataset [1] to demonstrate 
-the practical use of our package. The METABRIC dataset was obtained from 
-SYNAPSE. We filtered out samples which seemed to be positive for ER, PR, 
+In this vignette, we walk through a case study of the breast cancer microarray 
+dataset GSE25055 [1] to demonstrate the practical use of our package. 
+The GSE25055 dataset was obtained from the \texttt{curatedBreastData} package. 
+We filtered out samples which seemed to be positive for ER, PR, 
 and HER2 based on immunohistochemistry results and the distribution of 
 gene expression.\paragraph{}
 First, we load the package and the processed expression data. The dataset 
-includes a total of 24,368 genes and 299 samples. Note that rows and columns 
+includes a total of 12,722 genes and 73 samples. Note that rows and columns 
 correspond to genes and samples, and row names must be gene symbols.
 <<loadPackagesAndData>>=
 library(TNBC.CMS)
-load("D:/TNBC/data/METABRIC_processed_expression.rda")
-dim(exprMETABRIC)
-exprMETABRIC[1:5, 1:5]
+data("GSE25055.exprs")
+dim(GSE25055.exprs)
+GSE25055.exprs[1:5, 1:5]
 @
 
 \pagebreak
@@ -91,7 +91,7 @@ to TNBC samples based on a gene expression matrix. Input matrix should
 neither be scaled nor log-transformed. Class probabilities can be 
 retrieved by accessing the \texttt{probabilities} attribute.
 <<prediction>>=
-predictions <- predictCMS(exprMETABRIC)
+predictions <- predictCMS(GSE25055.exprs)
 table(predictions)
 head(attr(predictions, "probabilities"))
 @
@@ -101,7 +101,7 @@ head(attr(predictions, "probabilities"))
 %------------------------------------------------------------
 The \texttt{TNBC.CMS} package includes several functions for studying 
 genomic and clinical characteristics of the consensus molecular subtypes. 
-In this section, we apply these functions to the METABRIC datasets of 
+In this section, we apply these functions to the GSE25055 datasets of 
 gene expression and clinical features.\paragraph{}
 The \texttt{computeGES} function calculates signature scores for the 
 following 7 gene expression signatures: EMT (epithelial-mesencymal 
@@ -115,7 +115,7 @@ and stemness scores are significantly higher in MSL, IM, LAR, and SL subgroups
 than in other subgroups, respectively.
 
 <<label=ges,fig.height=4,fig.cap="Gene expression signature scores", fig.pos="H",fig.show="hold">>=
-resultGES <- computeGES(exp.mat = exprMETABRIC, pred = predictions, 
+resultGES <- computeGES(exp.mat = GSE25055.exprs, pred = predictions, 
                         rnaseq = FALSE)
 resultGES[,1:4]
 @
@@ -129,28 +129,27 @@ which is set to \texttt{"Gaussian"} by default. If expression levels are
 integer counts, the \texttt{"Poisson"} is recommended.\paragraph{}
 Figure 2 shows differential activation of the hallmark pathways across 
 the subtypes. The MSL subtype has high levels of EMT and P53 pathway 
-activation, and the IM subtype shows the highest inflammatory response. 
+activation, and the IM subtype shows the high interferon gamma response. 
 AR and ER response pathways are highly activated in the LAR subtpe, and 
 the expression of cell cycle associated pathway genes is up-regulated 
 in the SL subtype.
 <<label=gsa,fig.height=6,fig.cap="GSVA enrichment scores",fig.pos="H",fig.show="hold">>=
-resultGSVA <- performGSVA(exp.mat = exprMETABRIC, pred = predictions, 
+resultGSVA <- performGSVA(exp.mat = GSE25055.exprs, pred = predictions, 
                           gene.set = NULL)
 head(resultGSVA[,1:4])
 @
 
 The \texttt{TNBC.CMS} package provides two functions for survival 
-analysis: \texttt{plotKM} and \texttt{plotHR}. Here, we use the five-year 
-survival data from the METABRIC dataset to study the association between 
+analysis: \texttt{plotKM} and \texttt{plotHR}. Here, we use the 
+survival data from the GSE25055 dataset to study the association between 
 overall survival and the consensus molecular subtypes.\paragraph{}
 The \texttt{plotKM} function produces a Kaplan-Meier curve for each 
-consensus molecular subtype like Figure 3. The MSL subtype had significantly
-better prognosis than other subtypes while the SL group showed the worst 
+consensus molecular subtype like Figure 3. The SL group showed the worst 
 prognosis, which is consistent with our previous study.
 <<label=os,fig.height=3,fig.width=5,fig.cap="Overall survival",fig.pos="H",fig.show="hold",fig.align="center">>=
-load("D:/TNBC/data/METABRIC_clinical_features.rda")
-time <- clinMETABRIC$OS5_MONTHS
-event <- clinMETABRIC$OS5_STATUS
+data("GSE25055.clinical")
+time <- GSE25055.clinical$DFS.month
+event <- GSE25055.clinical$DFS.status
 plotKM(pred = predictions, time = time, event = event)
 @
 
@@ -164,20 +163,21 @@ library(survival)
 
 #Test for difference of survival between low and high expression groups
 surv <- Surv(time, event)
-chisq <- apply(exprMETABRIC, 1, function(x) survdiff(surv ~ (x > median(x)))$chisq)
-pval <- 1-pchisq(chisq, 1)
+exprs <- GSE25055.exprs[apply(GSE25055.exprs, 1, var) > 0.5, ]
+chisq <- apply(exprs, 1, function(x) survdiff(surv ~ (x > median(x)))$chisq)
+pval <- 1 - pchisq(chisq, 1)
 
 #Select 10 genes with lowest p-values for the log-rank test
 gs <- names(sort(pval)[1:10])
 gs
-plotHR(exp.mat = exprMETABRIC, gene.symbol = gs, pred = predictions, time = time,
+plotHR(exp.mat = GSE25055.exprs, gene.symbol = gs, pred = predictions, time = time,
        event = event, by.subtype = FALSE)
 @
 
 Also, as shown in Figure 5, subtype-specific hazard ratios for genes 
 of interest can be computed by setting the \texttt{by.subtype} argument.
 <<label=hrsub,fig.height=4,fig.cap="Forest plot of subtype-specific hazard ratios",fig.pos="H",fig.show="hold">>=
-plotHR(exp.mat = exprMETABRIC, gene.symbol = gs[1:4], pred = predictions, 
+plotHR(exp.mat = GSE25055.exprs, gene.symbol = gs[1:4], pred = predictions, 
        time = time, event = event, by.subtype = TRUE)
 @
 
@@ -201,7 +201,7 @@ respectively. Also, the IM and LAR subtypes show higher levels of signature
 scores for androgen agonist and SB216763 (an inhibitor of GSK3B) 
 than other subtypes, respectively.
 <<label=ds,fig.height=3,fig.cap="Drug signature scores",fig.pos="H",fig.show="hold">>=
-resultDS <- computeDS(exp.mat = exprMETABRIC, pred = predictions)
+resultDS <- computeDS(exp.mat = GSE25055.exprs, pred = predictions)
 head(resultDS[,1:4])
 @
 
@@ -213,10 +213,10 @@ head(resultDS[,1:4])
 For future analysis, it is useful to save the results of subtype assignment 
 and characterization into a data frame and save it into a text file.
 <<saveResults>>=
-dfCMS <- data.frame(row.names = colnames(exprMETABRIC), CMS = predictions, t(resultGES),
+dfCMS <- data.frame(row.names = colnames(GSE25055.exprs), CMS = predictions, t(resultGES),
                     t(resultDS), stringsAsFactors = FALSE)
 head(dfCMS)
-write.table(dfCMS, file = "D:/TNBC/result/METABRIC_CMS.txt")
+write.table(dfCMS, file = "GSe25055_CMS.txt")
 @
 
 %------------------------------------------------------------
@@ -229,11 +229,11 @@ sessionInfo()
 \renewcommand{\refname}{\section{References}}
 \begin{thebibliography}{1}
 
-\bibitem{metabric}
-Curtis, C. et al. (2012).
-\newblock The genomic and transcriptomic architecture of 2,000 breast tumours 
-reveals novel subgroups
-\newblock {\em Nature\/}, {\bf 486}, 346.
+\bibitem{gse25055}
+Hatzis, C. et al. (2011).
+\newblock A genomic predictor of response and survival following 
+taxane-anthracycline chemotherapy for invasive breast cancer
+\newblock {\em JAMA\/}, {\bf 305}, 1873--81.
 
 \bibitem{emt}
 Tan, T.Z. et al. (2014).

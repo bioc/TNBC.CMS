@@ -1,6 +1,14 @@
+TNBC.CMS version 0.99.1
+==============
+
+Changes:
+
+* Modified a vignette to use the package data instead of the external data.
+
+
 TNBC.CMS version 0.99.0
 ==============
 
 Changes:
 
-* Submitted to Bioconductor
+* Submitted to Bioconductor.
