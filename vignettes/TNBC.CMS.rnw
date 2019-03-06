@@ -59,12 +59,6 @@ drug responses.
 %------------------------------------------------------------
 \section{Loading package and dataset for case studies}
 %------------------------------------------------------------
-To install the \texttt{TNBC.CMS} package, enter the following commands:
-<<installAndLoadPackages,eval=FALSE,results='hide',message=FALSE>>=
-source("http://bioconductor.org/biocLite.R")
-biocLite("TNBC.CMS")
-@
-
 In this vignette, we walk through a case study of the breast cancer microarray 
 dataset GSE25055 [1] to demonstrate the practical use of our package. 
 The GSE25055 dataset was obtained from the \texttt{curatedBreastData} package. 
