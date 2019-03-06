@@ -7,10 +7,10 @@
 plotHR(exp.mat, gene.symbol, pred, time, event, by.subtype = TRUE)
 }
 \arguments{
-\item{exp.mat}{A matrix of gene expression with genes in rows and 
+\item{exp.mat}{A matrix of gene expression with genes in rows and
 samples in columns (rownames corresopnding to gene symbol).}
 
-\item{gene.symbol}{A vector of gene symbols for 
+\item{gene.symbol}{A vector of gene symbols for
 which hazard ratios are computed.}
 
 \item{pred}{A vector of predicted consensus molecular subtypes.}
@@ -19,14 +19,14 @@ which hazard ratios are computed.}
 
 \item{event}{A vector representing survival status (0 = alive, 1 = dead).}
 
-\item{by.subtype}{A logical to determine if subtype-specific 
+\item{by.subtype}{A logical to determine if subtype-specific
 hazard ratios are computed (default is TRUE).}
 }
 \value{
-Forest plot of hazard ratios.
+A forest plot of hazard ratios.
 }
 \description{
-Produces a forest plot of hazard ratios for each gene. 
+Produces a forest plot of hazard ratios for each gene.
 Also draws a forest plot of subtype-specific hazard ratios.
 }
 \examples{

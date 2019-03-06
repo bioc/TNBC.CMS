@@ -13,8 +13,8 @@ the \code{curatedBreastData} package.
 https://bioconductor.org/packages/release/data/experiment/html/curatedBreastData.html
 }
 \references{
-Hatzis, D. et al. (2017). xCell: digitally portraying the tissue
-cellular heterogeneity landscape. \emph{Genome biology}, 18, 220.
+Curtis, C. et al. (2012). The genomic and transcriptomic architecture of 2,000 breast tumours
+reveals novel subgroups. \emph{Nature}, 486, 346.
 }
 \examples{
 data(GSE25055.clinical)

@@ -7,14 +7,14 @@
 predictCMS(exp.mat)
 }
 \arguments{
-\item{exp.mat}{A matrix of gene expression with genes in rows and samples 
+\item{exp.mat}{A matrix of gene expression with genes in rows and samples
 in columns (rownames corresopnding to gene symbol).}
 }
 \value{
 A vector of assigned subtypes.
 }
 \description{
-This function predicts the TNBC consensus molecular subtype of TNBC samples.
+Predicts the TNBC consensus molecular subtype of TNBC samples.
 }
 \examples{
 # Load gene expression profiles of TNBC samples
