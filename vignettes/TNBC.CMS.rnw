@@ -1,10 +1,8 @@
 %\VignetteIndexEntry{TNBC.CMS: prediction of TNBC consensus molecular subtype}
-%\VignetteDepends{e1071, quadprog}
+%\VignetteDepends{e1071, quadprog, SummarizedExperiment}
 %\VignetteImports{GSVA, pheatmap, grDevices, RColorBrewer, pracma}
 %\VignettePackage{TNBC.CMS}
 %\VignetteEngine{knitr::knitr}
-
-%%%http://yihui.name/knitr/options/
 
 \documentclass{article}
 \usepackage{graphicx}
@@ -35,44 +33,46 @@ options(scipen = 1, digits = 2, warn = -1)
 \author[2]{In Hae Park}
 \author[1]{Charny Park}
 
-\affil[1]{Clinical Genomics Analysis Branch, Research Institute, 
+\affil[1]{Clinical Genomics Analysis Branch, Research Institute,
 National Cancer Center, Gyeonggi-do, Republic of Korea}
-\affil[2]{Center for Breast Cancer, Hospital, National Cancer Center, 
+\affil[2]{Center for Breast Cancer, Hospital, National Cancer Center,
 Gyeonggi-do, Republic of Korea}
 
+\date{March 07, 2019}
 \maketitle
 \tableofcontents
 \pagebreak
 %------------------------------------------------------------
 \section{Introduction}
 %------------------------------------------------------------
-TNBC.CMS is a package for molecular subtype classification of 
-triple-negative breast cancer (TNBC). While various classification strategies 
-have been proposed, absence of precise subtype classifier was a limitation of 
-patient diagnosis and TNBC studies. Our machine learning-based classifier model 
-was derived from gene expression profiles of 957 TNBC patients. 
-The TNBC.CMS package classifies patients into four consensus molecular subtypes 
-(CMS): mesenchymal-like (MSL), immunomodulatory (IM), luminal AR (LAR) and 
-stem-like (SL). It also provides a summary of genomic and clinical 
-characteristics including survival, hazard ratio, pathway activities and 
+TNBC.CMS is a package for molecular subtype classification of
+triple-negative breast cancer (TNBC). While various classification strategies
+have been proposed, absence of precise subtype classifier was a limitation of
+patient diagnosis and TNBC studies. Our machine learning-based classifier model
+was derived from gene expression profiles of 957 TNBC patients.
+The TNBC.CMS package classifies patients into four consensus molecular subtypes
+(CMS): mesenchymal-like (MSL), immunomodulatory (IM), luminal AR (LAR) and
+stem-like (SL). It also provides a summary of genomic and clinical
+characteristics including survival, hazard ratio, pathway activities and
 drug responses.
 %------------------------------------------------------------
 \section{Loading package and dataset for case studies}
 %------------------------------------------------------------
-In this vignette, we walk through a case study of the breast cancer microarray 
-dataset GSE25055 [1] to demonstrate the practical use of our package. 
-The GSE25055 dataset was obtained from the \texttt{curatedBreastData} package. 
-We filtered out samples which seemed to be positive for ER, PR, 
-and HER2 based on immunohistochemistry results and the distribution of 
+In this vignette, we walk through a case study of the breast cancer microarray
+dataset GSE25055 [1] to demonstrate the practical use of our package.
+The GSE25055 dataset was obtained from the \texttt{curatedBreastData} package.
+We filtered out samples which seemed to be positive for ER, PR,
+and HER2 based on immunohistochemistry results and the distribution of
 gene expression.\paragraph{}
-First, we load the package and the processed expression data. The dataset 
-includes a total of 4,746 genes and 73 samples. Note that rows and columns 
+First, we load the package and the processed expression data. The dataset is
+contained in a \texttt{SummarizedExperiment} object, which includes expression
+profiles of 4,746 genes and 73 samples. Note that rows and columns
 correspond to genes and samples, and row names must be gene symbols.
 <<loadPackagesAndData>>=
-library(TNBC.CMS)
-data("GSE25055.exprs")
-dim(GSE25055.exprs)
-GSE25055.exprs[1:5, 1:5]
+library(TNBC.CMS, quietly = TRUE)
+data("GSE25055")
+dim(assays(GSE25055)[[1]])
+assays(GSE25055)[[1]][1:5, 1:5]
 @
 
 \pagebreak
@@ -80,12 +80,14 @@ GSE25055.exprs[1:5, 1:5]
 %------------------------------------------------------------
 \section{Case study: CMS classification}
 %------------------------------------------------------------
-The \texttt{predictCMS} function assigns consensus molecular subtypes 
-to TNBC samples based on a gene expression matrix. Input matrix should 
-neither be scaled nor log-transformed. Class probabilities can be 
-retrieved by accessing the \texttt{probabilities} attribute.
+The \texttt{predictCMS} function assigns consensus molecular subtypes
+to TNBC samples based on input matrix or \texttt{SummarizedExperiment} object.
+If input is a \texttt{SummarizedExperiment} object, the first element in the
+assays list should be a matrix of gene expression. In any case, gene expression
+profiles should neither be scaled nor log-transformed. Class probabilities
+can be retrieved by accessing the \texttt{probabilities} attribute.
 <<prediction>>=
-predictions <- predictCMS(GSE25055.exprs)
+predictions <- predictCMS(GSE25055)
 table(predictions)
 head(attr(predictions, "probabilities"))
 @
@@ -93,108 +95,110 @@ head(attr(predictions, "probabilities"))
 %------------------------------------------------------------
 \section{Case study: summary of genomic and clinical characteristics}
 %------------------------------------------------------------
-The \texttt{TNBC.CMS} package includes several functions for studying 
-genomic and clinical characteristics of the consensus molecular subtypes. 
-In this section, we apply these functions to the GSE25055 datasets of 
+The \texttt{TNBC.CMS} package includes several functions for studying
+genomic and clinical characteristics of the consensus molecular subtypes.
+In this section, we apply these functions to the GSE25055 datasets of
 gene expression and clinical features.\paragraph{}
-The \texttt{computeGES} function calculates signature scores for the 
-following 7 gene expression signatures: EMT (epithelial-mesencymal 
-transition), stromal, immune, microenvironment, stemness, hormone, and 
-CIN (chromosomal instability) [2-6]. For more details about the gene expression 
-signatures, please see the manual page for \texttt{computeGES} 
+The \texttt{computeGES} function calculates signature scores for the
+following 7 gene expression signatures: EMT (epithelial-mesencymal
+transition), stromal, immune, microenvironment, stemness, hormone, and
+CIN (chromosomal instability) [2-6]. For more details about the gene expression
+signatures, please see the manual page for \texttt{computeGES}
 function.\paragraph{}
-As shown in Figure 1, this function also draws boxplots of signature scores 
-with p-values of comparison among the subtypes. Stromal, immune, hormone, 
-and stemness scores are significantly higher in MSL, IM, LAR, and SL subgroups 
+As shown in Figure 1, this function also draws boxplots of signature scores
+with p-values of comparison among the subtypes. Stromal, immune, hormone,
+and stemness scores are significantly higher in MSL, IM, LAR, and SL subgroups
 than in other subgroups, respectively.
 
 <<label=ges,fig.height=4,fig.cap="Gene expression signature scores", fig.pos="H",fig.show="hold">>=
-resultGES <- computeGES(exp.mat = GSE25055.exprs, pred = predictions, 
+resultGES <- computeGES(expr = GSE25055, pred = predictions,
                         rnaseq = FALSE)
 resultGES[,1:4]
 @
 
-The \texttt{performGSVA} function performs gene set variation analysis 
-on gene sets and produces a heatmap representing GSVA enrichment scores [7]. 
-If gene sets are not given, the hallmark pathway gene sets are used [8]. 
-The user can also choose a kernel for estimating the cumulative distribution 
-function of expression values by setting the \texttt{gsva.kcdf} argument, 
-which is set to \texttt{"Gaussian"} by default. If expression levels are 
+The \texttt{performGSVA} function performs gene set variation analysis
+on gene sets and produces a heatmap representing GSVA enrichment scores [7].
+If gene sets are not given, the hallmark pathway gene sets are used [8].
+The user can also choose a kernel for estimating the cumulative distribution
+function of expression values by setting the \texttt{gsva.kcdf} argument,
+which is set to \texttt{"Gaussian"} by default. If expression levels are
 integer counts, the \texttt{"Poisson"} is recommended.\paragraph{}
-Figure 2 shows differential activation of the hallmark pathways across 
-the subtypes. The MSL subtype has high levels of EMT and P53 pathway 
-activation, and the IM subtype shows the high interferon gamma response. 
-AR and ER response pathways are highly activated in the LAR subtpe, and 
-the expression of cell cycle associated pathway genes is up-regulated 
+Figure 2 shows differential activation of the hallmark pathways across
+the subtypes. The MSL subtype has high levels of EMT and P53 pathway
+activation, and the IM subtype shows the high interferon gamma response.
+AR and ER response pathways are highly activated in the LAR subtpe, and
+the expression of cell cycle associated pathway genes is up-regulated
 in the SL subtype.
 <<label=gsa,fig.height=6,fig.cap="GSVA enrichment scores",fig.pos="H",fig.show="hold">>=
-resultGSVA <- performGSVA(exp.mat = GSE25055.exprs, pred = predictions, 
+resultGSVA <- performGSVA(expr = GSE25055, pred = predictions,
                           gene.set = NULL)
 head(resultGSVA[,1:4])
 @
 
-The \texttt{TNBC.CMS} package provides two functions for survival 
-analysis: \texttt{plotKM} and \texttt{plotHR}. Here, we use the 
-survival data from the GSE25055 dataset to study the association between 
-overall survival and the consensus molecular subtypes.\paragraph{}
-The \texttt{plotKM} function produces a Kaplan-Meier curve for each 
-consensus molecular subtype like Figure 3. The SL group showed the worst 
+The \texttt{TNBC.CMS} package provides two functions for survival
+analysis: \texttt{plotKM} and \texttt{plotHR}. Here, we use the
+survival data from the GSE25055 dataset to study the association between
+overall survival and the consensus molecular subtypes. The survival data is also
+included in the \texttt{SummarizedExperiment} object and can be accessed using
+the \texttt{colData} function. \paragraph{}
+The \texttt{plotKM} function produces a Kaplan-Meier curve for each
+consensus molecular subtype like Figure 3. The SL group showed the worst
 prognosis, which is consistent with our previous study.
 <<label=os,fig.height=3,fig.width=5,fig.cap="Overall survival",fig.pos="H",fig.show="hold",fig.align="center">>=
-data("GSE25055.clinical")
-time <- GSE25055.clinical$DFS.month
-event <- GSE25055.clinical$DFS.status
+time <- colData(GSE25055)$DFS.month
+event <- colData(GSE25055)$DFS.status
 plotKM(pred = predictions, time = time, event = event)
 @
 
-The \texttt{plotHR} produces a forest plot of hazard ratios for genes 
-that the user provides. For each input gene, samples are divided into 
-high and low groups based on its expression level and the 95\% confidence 
-interval for the hazard ratio is calculated. We selected 10 genes significantly 
+The \texttt{plotHR} produces a forest plot of hazard ratios for genes
+that the user provides. For each input gene, samples are divided into
+high and low groups based on its expression level and the 95\% confidence
+interval for the hazard ratio is calculated. We selected 10 genes significantly
 associated with overall survival and generated a forest plot (Figure 4).
 <<label=hr,fig.height=3,fig.cap="Forest plot of hazard ratios",fig.pos="H",fig.show="hold">>=
 library(survival)
 
 #Test for difference of survival between low and high expression groups
 surv <- Surv(time, event)
+GSE25055.exprs <- assays(GSE25055)[[1]]
 chisq <- apply(GSE25055.exprs, 1, function(x) survdiff(surv ~ (x > median(x)))$chisq)
 pval <- 1 - pchisq(chisq, 1)
 
 #Select 10 genes with lowest p-values for the log-rank test
 gs <- names(sort(pval)[1:10])
 gs
-plotHR(exp.mat = GSE25055.exprs, gene.symbol = gs, pred = predictions, time = time,
+plotHR(expr = GSE25055, gene.symbol = gs, pred = predictions, time = time,
        event = event, by.subtype = FALSE)
 @
 
-Also, as shown in Figure 5, subtype-specific hazard ratios for genes 
+Also, as shown in Figure 5, subtype-specific hazard ratios for genes
 of interest can be computed by setting the \texttt{by.subtype} argument.
 <<label=hrsub,fig.height=4,fig.cap="Forest plot of subtype-specific hazard ratios",fig.pos="H",fig.show="hold">>=
-plotHR(exp.mat = GSE25055.exprs, gene.symbol = gs[1:4], pred = predictions, 
+plotHR(expr = GSE25055, gene.symbol = gs[1:4], pred = predictions,
        time = time, event = event, by.subtype = TRUE)
 @
 
 %------------------------------------------------------------
 \section{Case study: drug response investigation}
 %------------------------------------------------------------
-The \texttt{TNBC.CMS} package also provides a function for predicting 
-drug responses. The \texttt{computeDS} function computes drug signature 
-scores for the corresponding gene sets in the MSigDB CGP (chemical and 
-genetic perturbations) collection [9] and draws a heatmap of the signature 
-scores. Drug signature scores are calculated as the difference between 
-the average expression values of gene sets associated with drug response 
-and resistance. The higher a signature score is, the more likely a patient 
-is to be responsive. The user can provide their own gene sets via 
-the \texttt{gene.set} argument. Note that names of gene sets must follow 
-the format of [DRUG NAME]{\_}[RESPONSE/RESISTANCE]{\_}[UP/DN] 
+The \texttt{TNBC.CMS} package also provides a function for predicting
+drug responses. The \texttt{computeDS} function computes drug signature
+scores for the corresponding gene sets in the MSigDB CGP (chemical and
+genetic perturbations) collection [9] and draws a heatmap of the signature
+scores. Drug signature scores are calculated as the difference between
+the average expression values of gene sets associated with drug response
+and resistance. The higher a signature score is, the more likely a patient
+is to be responsive. The user can provide their own gene sets via
+the \texttt{gene.set} argument. Note that names of gene sets must follow
+the format of [DRUG NAME]{\_}[RESPONSE/RESISTANCE]{\_}[UP/DN]
 (e.g. CISPLATIN{\_}RESISTANCE{\_}UP).\paragraph{}
-Figure 6 shows a heatmap of drug signature scores for each sample. 
-The MSL and SL subtypes appear to be resistant to dasatinib and doxorubicin, 
-respectively. Also, the IM and LAR subtypes show higher levels of signature 
-scores for androgen agonist and SB216763 (an inhibitor of GSK3B) 
+Figure 6 shows a heatmap of drug signature scores for each sample.
+The MSL and SL subtypes appear to be resistant to dasatinib and doxorubicin,
+respectively. Also, the IM and LAR subtypes show higher levels of signature
+scores for androgen agonist and SB216763 (an inhibitor of GSK3B)
 than other subtypes, respectively.
 <<label=ds,fig.height=3,fig.cap="Drug signature scores",fig.pos="H",fig.show="hold">>=
-resultDS <- computeDS(exp.mat = GSE25055.exprs, pred = predictions)
+resultDS <- computeDS(expr = GSE25055, pred = predictions)
 head(resultDS[,1:4])
 @
 
@@ -203,7 +207,7 @@ head(resultDS[,1:4])
 %------------------------------------------------------------
 \section{Saving results}
 %------------------------------------------------------------
-For future analysis, it is useful to save the results of subtype assignment 
+For future analysis, it is useful to save the results of subtype assignment
 and characterization into a data frame and save it into a text file.
 <<saveResults>>=
 dfCMS <- data.frame(row.names = colnames(GSE25055.exprs), CMS = predictions, t(resultGES),
@@ -224,40 +228,40 @@ sessionInfo()
 
 \bibitem{gse25055}
 Hatzis, C. et al. (2011).
-\newblock A genomic predictor of response and survival following 
+\newblock A genomic predictor of response and survival following
 taxane-anthracycline chemotherapy for invasive breast cancer
 \newblock {\em JAMA\/}, {\bf 305}, 1873--81.
 
 \bibitem{emt}
 Tan, T.Z. et al. (2014).
-\newblock Epithelial-mesenchymal transition spectrum 
-quantification and its efficacy in deciphering survival and drug responses 
+\newblock Epithelial-mesenchymal transition spectrum
+quantification and its efficacy in deciphering survival and drug responses
 of cancer patients.
 \newblock {\em EMBO molecular medicine\/}, {\bf 6}, 1279--93.
 
 \bibitem{estimate}
 Yoshihara, K. et al. (2013).
-\newblock Inferring tumour purity and stromal and 
-immune cell admixture from 
+\newblock Inferring tumour purity and stromal and
+immune cell admixture from
 expression data.
 \newblock {\em Nature communications\/}, {\bf 4}, 2612.
 
 \bibitem{xcell}
 Aran, D. et al. (2017).
-\newblock xCell: digitally portraying the tissue cellular 
+\newblock xCell: digitally portraying the tissue cellular
 heterogeneity landscape.
 \newblock {\em Genome biology\/}, {\bf 18}, 220.
 
 \bibitem{stem}
 Malta, T.M. et al. (2018).
-\newblock Machine learning identifies stemness features 
+\newblock Machine learning identifies stemness features
 associated with oncogenic dedifferentiation.
 \newblock {\em Cell\/}, {\bf 173}, 338--354.
 
 \bibitem{cin}
-Carter, S.L. et al. (2006).  
-\newblock A signature of chromosomal instability 
-inferred from gene expression profiles predicts clinical outcome in multiple 
+Carter, S.L. et al. (2006).
+\newblock A signature of chromosomal instability
+inferred from gene expression profiles predicts clinical outcome in multiple
 human cancers.
 \newblock {\em Nature genetics\/}, {\bf 38}, 1043.
 

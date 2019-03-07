@@ -4,11 +4,14 @@
 \alias{computeGES}
 \title{Computation of gene expression signature scores.}
 \usage{
-computeGES(exp.mat, pred, rnaseq = FALSE)
+computeGES(expr, pred, rnaseq = FALSE)
 }
 \arguments{
-\item{exp.mat}{A matrix of gene expression with genes in rows and samples
-in columns (rownames corresopnding to gene symbol).}
+\item{expr}{A \code{SummarizedExperiment} object or a matrix containig gene
+expression profiles. If input is a \code{SummarizedExperiment}, the first
+element in the assays list should be a matrix of gene expression.
+Rows and columns of the gene expression matrix correspond to genes and
+samples, respectively (rownames must be to gene symbols).}
 
 \item{pred}{A vector of predicted consensus molecular subtypes.}
 
@@ -44,13 +47,13 @@ included in the CIN70 signature published by \cite{Carter et al. (2006)}.
 }
 \examples{
 # Load gene expression profiles of TNBC samples
-data(GSE25055.exprs)
+data(GSE25055)
 
 # Predict consensus molecular subtypes of TNBC samples
-predictions <- predictCMS(exp.mat = GSE25055.exprs)
+predictions <- predictCMS(expr = GSE25055)
 
 # Compute gene expression signature scores
-resultGES <- computeGES(exp.mat = GSE25055.exprs, pred = predictions, rnaseq = FALSE)
+resultGES <- computeGES(expr = GSE25055, pred = predictions, rnaseq = FALSE)
 }
 \references{
 Aran, D. et al. (2017). xCell: digitally portraying

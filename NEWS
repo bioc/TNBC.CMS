@@ -1,23 +1,31 @@
+TNBC.CMS version 0.99.5
+==============
+
+Changes:
+
+* Updated R dependency
+* Now support SummarizedExperiment as input data type
+
 TNBC.CMS version 0.99.4
 ==============
 
 Changes:
 
-* Edited a vignette 
+* Edited a vignette
 
 TNBC.CMS version 0.99.3
 ==============
 
 Changes:
 
-* Reduced the number of cores used in GSVA 
+* Reduced the number of cores used in GSVA
 
 TNBC.CMS version 0.99.2
 ==============
 
 Changes:
 
-* Fixed errors and warnings. 
+* Fixed errors and warnings.
 
 TNBC.CMS version 0.99.1
 ==============

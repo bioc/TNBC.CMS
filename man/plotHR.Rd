@@ -4,11 +4,14 @@
 \alias{plotHR}
 \title{Forest plot of hazard ratios}
 \usage{
-plotHR(exp.mat, gene.symbol, pred, time, event, by.subtype = TRUE)
+plotHR(expr, gene.symbol, pred, time, event, by.subtype = TRUE)
 }
 \arguments{
-\item{exp.mat}{A matrix of gene expression with genes in rows and
-samples in columns (rownames corresopnding to gene symbol).}
+\item{expr}{A \code{SummarizedExperiment} object or a matrix containig gene
+expression profiles. If input is a \code{SummarizedExperiment}, the first
+element in the assays list should be a matrix of gene expression.
+Rows and columns of the gene expression matrix correspond to genes and
+samples, respectively (rownames must be to gene symbols).}
 
 \item{gene.symbol}{A vector of gene symbols for
 which hazard ratios are computed.}
@@ -31,19 +34,20 @@ Also draws a forest plot of subtype-specific hazard ratios.
 }
 \examples{
 # Load gene expression profiles and clinical information of TNBC samples
-data(GSE25055.exprs)
-data(GSE25055.clinical)
+data(GSE25055)
+DFS.status <- colData(GSE25055)$DFS.status
+DFS.month <- colData(GSE25055)$DFS.month
 
 # Predict consensus molecular subtypes of TNBC samples
-predictions <- predictCMS(exp.mat = GSE25055.exprs)
+predictions <- predictCMS(expr = GSE25055)
 
 # Forest plot of hazard ratios for input genes
-plotHR(exp.mat = GSE25055.exprs, gene.symbol = c("RECK", "RELN", "EHD4", "PRRX2"),
-       pred = predictions, time = GSE25055.clinical$DFS.month,
-       event = GSE25055.clinical$DFS.status, by.subtype = FALSE)
+plotHR(expr = GSE25055, gene.symbol = c("RECK", "RELN", "EHD4", "PRRX2"),
+       pred = predictions, time = DFS.month, event = DFS.status,
+       by.subtype = FALSE)
 
 # Subtype-specific forest plot of hazard ratios for input genes
-plotHR(exp.mat = GSE25055.exprs, gene.symbol = c("RECK", "RELN", "EHD4", "PRRX2"),
-       pred = predictions, time = GSE25055.clinical$DFS.month,
-       event = GSE25055.clinical$DFS.status, by.subtype = TRUE)
+plotHR(expr = GSE25055, gene.symbol = c("RECK", "RELN", "EHD4", "PRRX2"),
+       pred = predictions, time = DFS.month, event = DFS.status,
+       by.subtype = TRUE)
 }

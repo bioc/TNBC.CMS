@@ -20,14 +20,14 @@ A \code{ggplot} object.
 Produces Kaplan-Meier survival curves for each subtype.
 }
 \examples{
-# Load gene expression profiles and clinical information of TNBC samples
-data(GSE25055.exprs)
-data(GSE25055.clinical)
+# Load clinical information of TNBC samples
+data(GSE25055)
+DFS.status <- colData(GSE25055)$DFS.status
+DFS.month <- colData(GSE25055)$DFS.month
 
 # Predict consensus molecular subtypes of TNBC samples
-predictions <- predictCMS(exp.mat = GSE25055.exprs)
+predictions <- predictCMS(expr = GSE25055)
 
 # Plot Kaplan-Meier curves for each subtype
-plotKM(pred = predictions, time = GSE25055.clinical$DFS.month,
-       event = GSE25055.clinical$DFS.status)
+plotKM(pred = predictions, time = DFS.month, event = DFS.status)
 }

@@ -4,11 +4,14 @@
 \alias{computeDS}
 \title{Computation of drug signature scores.}
 \usage{
-computeDS(exp.mat, pred, gene.set = NULL)
+computeDS(expr, pred, gene.set = NULL)
 }
 \arguments{
-\item{exp.mat}{A matrix of gene expression with genes in rows and samples
-in columns (rownames corresopnding to gene symbol).}
+\item{expr}{A \code{SummarizedExperiment} object or a matrix containig gene
+expression profiles. If input is a \code{SummarizedExperiment}, the first
+element in the assays list should be a matrix of gene expression.
+Rows and columns of the gene expression matrix correspond to genes and
+samples, respectively (rownames must be to gene symbols).}
 
 \item{pred}{A vector of predicted consensus molecular subtypes.}
 
@@ -29,13 +32,13 @@ genes included in gene sets from MSigDB.
 }
 \examples{
 # Load gene expression profiles of TNBC samples
-data(GSE25055.exprs)
+data(GSE25055)
 
 # Predict consensus molecular subtypes of TNBC samples
-predictions <- predictCMS(exp.mat = GSE25055.exprs)
+predictions <- predictCMS(expr = GSE25055)
 
 # Compute drug signature scores
-resultDS <- computeDS(exp.mat = GSE25055.exprs, pred = predictions)
+resultDS <- computeDS(expr = GSE25055, pred = predictions)
 }
 \references{
 Liberzon, A. et al. (2011). Molecular signatures database
