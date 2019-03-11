@@ -38,7 +38,7 @@ National Cancer Center, Gyeonggi-do, Republic of Korea}
 \affil[2]{Center for Breast Cancer, Hospital, National Cancer Center,
 Gyeonggi-do, Republic of Korea}
 
-\date{March 06, 2019}
+\date{March 10, 2019}
 \maketitle
 \tableofcontents
 \pagebreak
@@ -68,8 +68,8 @@ First, we load the package and the processed expression data. The dataset is
 contained in a \texttt{SummarizedExperiment} object, which includes expression
 profiles of 4,746 genes and 73 samples. Note that rows and columns
 correspond to genes and samples, and row names must be gene symbols.
-<<loadPackagesAndData>>=
-library(TNBC.CMS, quietly = TRUE)
+<<loadPackagesAndData,message=FALSE>>=
+library(TNBC.CMS)
 data("GSE25055")
 dim(assays(GSE25055)[[1]])
 assays(GSE25055)[[1]][1:5, 1:5]
@@ -110,10 +110,89 @@ with p-values of comparison among the subtypes. Stromal, immune, hormone,
 and stemness scores are significantly higher in MSL, IM, LAR, and SL subgroups
 than in other subgroups, respectively.
 
-<<label=ges,fig.height=4,fig.cap="Gene expression signature scores", fig.pos="H",fig.show="hold">>=
+<<include=FALSE>>=
+resultGES <- t(as.matrix(colData(GSE25055)[,3:9]))
+@
+
+<<eval=FALSE>>=
 resultGES <- computeGES(expr = GSE25055, pred = predictions,
                         rnaseq = FALSE)
+<<eval=TRUE>>=
 resultGES[,1:4]
+@
+
+<<label=gesplot,echo=FALSE,fig.height=4,fig.cap="Gene expression signature scores",fig.pos="H",message=FALSE>>=
+library(grid)
+library(ggpubr)
+CMS.palette <- c("MSL" = "brown2", "IM" = "gold2",
+                   "LAR" = "yellowgreen", "SL" = "midnightblue")
+pval1 <- 8.1e-7
+pval2 <- 3.6e-6
+pval3 <- 0.016
+pval4 <- 0.00034
+TITLE_SIZE <- 12
+SUBTITLE_SIZE <- 10
+
+sigdat <- data.frame(t(resultGES))
+sigdat$CMS <- predictions
+
+sub1 <- bquote(paste("Wilcoxon (MSL vs. others) ",
+                         italic(p), " = ", .(format(pval1, digits = 2))))
+sub2 <- bquote(paste("Wilcoxon (MSL vs. others) ",
+                         italic(p), " = ", .(format(pval2, digits = 2))))
+sub3 <- bquote(paste("Wilcoxon (MSL vs. others) ",
+                         italic(p), " = ", .(format(pval3, digits = 2))))
+sub4 <- bquote(paste("Wilcoxon (MSL vs. others) ",
+                         italic(p), " = ", .(format(pval4, digits = 2))))
+
+p1 <- ggboxplot(sigdat, x = "CMS", y = "Stromal",
+                fill = "CMS", palette = CMS.palette) +
+  theme_bw() + labs(title = "Stromal", subtitle = sub1) +
+  theme(legend.position = "none", axis.title = element_blank(),
+        axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+        panel.grid = element_blank(),
+        plot.title = element_text(size = TITLE_SIZE,
+                                  hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(size=  SUBTITLE_SIZE, hjust = 0.5))
+
+p2 <- ggboxplot(sigdat, x = "CMS", y = "Immune",
+                fill = "CMS", palette = CMS.palette) +
+  theme_bw() + labs(title = "Immune", subtitle = sub2) +
+  theme(legend.position = "none", axis.title = element_blank(),
+        axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+        panel.grid = element_blank(),
+        plot.title = element_text(size = TITLE_SIZE,
+                                  hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(size=  SUBTITLE_SIZE, hjust = 0.5))
+
+p3 <- ggboxplot(sigdat, x = "CMS", y = "Hormone",
+                fill = "CMS", palette = CMS.palette) +
+  theme_bw() + labs(title = "Hormone", subtitle = sub3) +
+  theme(legend.position = "none", axis.title = element_blank(),
+        axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+        panel.grid = element_blank(),
+        plot.title = element_text(size = TITLE_SIZE,
+                                  hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(size=  SUBTITLE_SIZE, hjust = 0.5))
+
+p4 <- ggboxplot(sigdat, x = "CMS", y = "Stemness",
+                fill = "CMS", palette = CMS.palette) +
+  theme_bw() + labs(title = "Stem", subtitle = sub4) +
+  theme(legend.position = "none", axis.title = element_blank(),
+        axis.text.x = element_blank(), axis.ticks.x = element_blank(),
+        panel.grid = element_blank(),
+        plot.title = element_text(size = TITLE_SIZE,
+                                  hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(size=  SUBTITLE_SIZE, hjust = 0.5))
+
+g1 <- ggplotGrob(p1)
+g2 <- ggplotGrob(p2)
+g3 <- ggplotGrob(p3)
+g4 <- ggplotGrob(p4)
+g <- cbind(rbind(g1, g3, size = "first"),
+           rbind(g2,  g4, size = "first"), size = "first")
+grid.newpage()
+grid.draw(g)
 @
 
 The \texttt{performGSVA} function performs gene set variation analysis
