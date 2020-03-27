@@ -81,12 +81,13 @@ computeDS <- function(expr, pred, gene.set = NULL){
     gn <- names(gene.set)
     drug.names <- unlist(strsplit(gn, split = "\\_"))
     drug.names <- unique(drug.names[seq(0, length(gn) -1 ) * 3 + 1])
-    ds.dat <- t(sapply(drug.names,
+    ds.dat <- t(vapply(drug.names,
                        function(x) computeSignature(gn[grep(x, gn)],
-                                                    gene.set)))
+                                                    gene.set),
+                       rep(0, ncol(exp.mat))))
 
-    annotation_col <- data.frame(row.names =
-                                   colnames(exp.mat)[order(pred)],
+
+    annotation_col <- data.frame(row.names = colnames(exp.mat)[order(pred)],
                                  CMS = pred[order(pred)])
 
     pheatmap(ds.dat[,colnames(exp.mat)[order(pred)]], color = rbpal,
